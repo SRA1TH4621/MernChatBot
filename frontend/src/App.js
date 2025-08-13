@@ -3,18 +3,21 @@ import axios from "axios";
 import "./App.css";
 
 function App() {
-  const [messages, setMessages] = useState(() => {
-    const saved = localStorage.getItem("chatMessages");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
   const [retryMessage, setRetryMessage] = useState(null);
   const messagesEndRef = useRef(null);
 
-  const saveToLocalStorage = (msgs) => {
-    localStorage.setItem("chatMessages", JSON.stringify(msgs));
-  };
+  // ✅ Show welcome message on load
+  useEffect(() => {
+    setMessages([
+      {
+        sender: "bot",
+        text: "👋 Hi! I'm your chatbot. How can I help you today?",
+      },
+    ]);
+  }, []);
 
   const handleSend = async (retryInput = null) => {
     const userInput = retryInput || input.trim();
@@ -23,34 +26,26 @@ function App() {
     const newUserMessage = { sender: "user", text: userInput };
     const updatedMessages = [...messages, newUserMessage];
     setMessages(updatedMessages);
-    saveToLocalStorage(updatedMessages);
     setInput("");
     setTyping(true);
     setRetryMessage(null);
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/chat",
+        "https://mernchatbot-seje.onrender.com/api/chat", // ✅ Your Render backend
         { message: userInput },
         { headers: { "Content-Type": "application/json" } }
       );
 
-      console.log("Bot Reply:", response.data.response);
-
       const newBotMessage = { sender: "bot", text: response.data.response };
-      const finalMessages = [...updatedMessages, newBotMessage];
-      setMessages(finalMessages);
-      saveToLocalStorage(finalMessages);
+      setMessages([...updatedMessages, newBotMessage]);
     } catch (err) {
       console.error("API Error:", err);
       setRetryMessage(userInput);
-      const errorMsg = {
-        sender: "bot",
-        text: "❗ Failed to get response. Please Retry.",
-      };
-      const errorMessages = [...updatedMessages, errorMsg];
-      setMessages(errorMessages);
-      saveToLocalStorage(errorMessages);
+      setMessages([
+        ...updatedMessages,
+        { sender: "bot", text: "❗ Failed to get response. Please Retry." },
+      ]);
     } finally {
       setTyping(false);
     }
@@ -60,18 +55,37 @@ function App() {
     if (retryMessage) handleSend(retryMessage);
   };
 
+  const handleClearChat = () => {
+    setMessages([
+      { sender: "bot", text: "👋 Chat cleared. How can I help you now?" },
+    ]);
+    setRetryMessage(null);
+  };
+
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleSend();
     }
   };
 
+  // ✅ Scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typing]);
 
   return (
     <div className="chat-container">
+      {/* ✅ Header with Clear Chat button */}
+      <div className="chat-header">
+        <h2>
+          <center>💬Esmeray Chatbot</center>
+        </h2>
+        <button className="clear-btn" onClick={handleClearChat}>
+          🗑 Clear Chat
+        </button>
+      </div>
+
+      {/* Chat messages */}
       <div className="chat-messages">
         {messages.map((msg, index) => (
           <div key={index} className={`chat-bubble ${msg.sender}`}>
@@ -102,6 +116,7 @@ function App() {
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Input box */}
       <div className="chat-input">
         <input
           type="text"

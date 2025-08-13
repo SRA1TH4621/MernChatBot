@@ -1,3 +1,4 @@
+// server.js
 const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
@@ -5,11 +6,24 @@ require("dotenv").config();
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+
+// ✅ Allow frontend to connect (update origin if you want to restrict access)
+app.use(
+  cors({
+    origin: "*", // Change "*" to your frontend URL for security
+    methods: ["GET", "POST"],
+  })
+);
 
 const PORT = process.env.PORT || 5000;
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
+// ✅ Root route to check if API is alive
+app.get("/", (req, res) => {
+  res.send("API is working!");
+});
+
+// ✅ Chat endpoint
 app.post("/api/chat", async (req, res) => {
   console.log("Incoming Request Body:", req.body);
 
@@ -41,12 +55,13 @@ app.post("/api/chat", async (req, res) => {
     res.json({ response: botReply });
   } catch (error) {
     console.error("Groq API Error:", error.response?.data || error.message);
-    res
-      .status(500)
-      .json({ response: "Sorry, I am unable to respond right now." });
+    res.status(500).json({
+      response: "Sorry, I am unable to respond right now.",
+    });
   }
 });
 
+// ✅ Start the server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
