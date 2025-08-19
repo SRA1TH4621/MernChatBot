@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE = "http://localhost:5000/api"; // Change if backend runs elsewhere
+const API_BASE = "https://mernchatbot-seje.onrender.com"; // Change if backend runs elsewhere
 
 // ===============================
 // 🤖 CHAT & AI SERVICES

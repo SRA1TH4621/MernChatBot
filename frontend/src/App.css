@@ -375,3 +375,110 @@
 .history-item-ai {
   color: #81c784;
 }
+/* === Responsive Styles === */
+
+/* Medium screens (tablets) */
+@media (max-width: 1024px) {
+  .chat-header h2 {
+    font-size: 1rem;
+  }
+
+  .chat-bubble {
+    max-width: 80%;
+    font-size: 0.9rem;
+  }
+
+  .chat-input input {
+    font-size: 0.9rem;
+  }
+
+  .chat-input button {
+    font-size: 0.9rem;
+    padding: 8px 16px;
+  }
+}
+
+/* Small screens (mobiles) */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 50px;
+  }
+
+  .chat-main {
+    margin-left: 50px;
+  }
+
+  .chat-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .chat-bubble {
+    max-width: 85%;
+    font-size: 0.85rem;
+  }
+
+  .chat-input {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .chat-input input {
+    margin-right: 0;
+    width: 100%;
+  }
+
+  .chat-input button {
+    width: 100%;
+  }
+
+  .plus-button {
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+  }
+}
+
+/* Extra small screens (small phones) */
+@media (max-width: 480px) {
+  .sidebar {
+    display: none;
+  }
+
+  .chat-main {
+    margin-left: 0;
+  }
+
+  .chat-header h2 {
+    font-size: 0.9rem;
+  }
+
+  .chat-bubble {
+    max-width: 95%;
+    font-size: 0.8rem;
+  }
+
+  .chat-input input {
+    font-size: 0.8rem;
+    padding: 8px;
+  }
+
+  .chat-input button {
+    font-size: 0.8rem;
+    padding: 8px 12px;
+  }
+
+  .plus-menu-container {
+    bottom: 70px;
+    right: 12px;
+  }
+}
+
+/* Large desktops */
+@media (min-width: 1600px) {
+  .chat-container {
+    max-width: 1500px;
+    margin: auto;
+  }
+}

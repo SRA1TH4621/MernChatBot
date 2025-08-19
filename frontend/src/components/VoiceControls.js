@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { transcribeAudio } from "../lib/api";
 
+import MicIcon from "../icons/mic.svg";
+import StopIcon from "../icons/stop.svg";
+
 function VoiceControls({ onTranscribed }) {
   const [recording, setRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
@@ -29,7 +32,6 @@ function VoiceControls({ onTranscribed }) {
       }
     };
 
-
     recorder.start();
     setMediaRecorder(recorder);
     setRecording(true);
@@ -43,8 +45,21 @@ function VoiceControls({ onTranscribed }) {
   };
 
   return (
-    <button onClick={recording ? stopRecording : startRecording}>
-      {recording ? "⏹ Stop" : "🎙 Speak"}
+    <button
+      onClick={recording ? stopRecording : startRecording}
+      style={{
+        background: "transparent",
+        border: "none",
+        cursor: "pointer",
+        marginLeft: "8px",
+      }}
+      title={recording ? "Stop Recording" : "Start Recording"}
+    >
+      <img
+        src={recording ? StopIcon : MicIcon}
+        alt={recording ? "Stop" : "Mic"}
+        width="26"
+      />
     </button>
   );
 }

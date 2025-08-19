@@ -5,6 +5,13 @@ import PlusMenu from "./components/PlusMenu";
 import HistoryDrawer from "./components/HistoryDrawer";
 import "./App.css";
 
+// === ICON IMPORTS ===
+import ChatbotIcon from "./icons/chatbot.svg";
+import HistoryIcon from "./icons/history.svg";
+import ClearIcon from "./icons/clear.svg";
+import SendIcon from "./icons/send.svg";
+import RetryIcon from "./icons/retry.svg";
+
 function App() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -124,10 +131,9 @@ function App() {
 
   // ✅ Voice input
   const handleTranscribed = (text) => {
-  console.log("📝 Received transcript:", text);
-  setInput(text);
-};
-
+    console.log("📝 Received transcript:", text);
+    setInput(text);
+  };
 
   // ✅ Image Upload
   const handleImageUpload = () => {
@@ -182,7 +188,7 @@ function App() {
       const newBotMessage = {
         sender: "bot",
         text: "🖼 Image generated:",
-        image: res.url, // ✅ FIXED
+        image: res.url,
       };
       setMessages((prev) => [...prev, newBotMessage]);
     } catch (err) {
@@ -215,16 +221,26 @@ function App() {
     <div className="chat-container">
       {/* Sidebar */}
       <div className="sidebar">
-        <button onClick={() => setHistoryOpen(true)}>📜 History</button>
+        <button onClick={() => setHistoryOpen(true)}>
+          <img src={HistoryIcon} alt="History" width="20" /> History
+        </button>
       </div>
 
       {/* Main Chat */}
       <div className="chat-main">
         <div className="chat-header">
-          <h2>💬 Esmeray Chatbot</h2>
-          <small>Esmeray 1.0 – AI Assistant</small>
+          <h2>
+            <img
+              src={ChatbotIcon}
+              alt="Chatbot"
+              width="24"
+              style={{ marginRight: "8px" }}
+            />
+            Esmeray Chatbot
+          </h2>
+          <small> Esmeray 1.o – AI Assistant</small>
           <button className="clear-btn" onClick={handleClearChat}>
-            🗑 Clear Chat
+            <img src={ClearIcon} alt="Clear" width="18" /> Clear Chat
           </button>
         </div>
 
@@ -236,12 +252,11 @@ function App() {
               {msg.text}
 
               {/* 🔊 TTS for bot messages */}
-              {/* 🔊 TTS for bot messages (backend gTTS) */}
               {msg.sender === "bot" && msg.text && (
                 <button
                   onClick={async () => {
                     try {
-                      const audioUrl = await fetchTTS(msg.text, "en"); // ✅ backend call
+                      const audioUrl = await fetchTTS(msg.text, "en");
                       const audio = new Audio(audioUrl);
                       audio.play();
                     } catch (err) {
@@ -283,7 +298,9 @@ function App() {
 
           {retryMessage && (
             <div className="retry-container">
-              <button onClick={handleRetry}>🔄 Retry</button>
+              <button onClick={handleRetry}>
+                <img src={RetryIcon} alt="Retry" width="18" /> Retry
+              </button>
             </div>
           )}
           <div ref={messagesEndRef} />
@@ -298,7 +315,9 @@ function App() {
             onKeyPress={handleKeyPress}
             placeholder="Type your message..."
           />
-          <button onClick={() => handleSend()}>Send</button>
+          <button onClick={() => handleSend()}>
+            <img src={SendIcon} alt="Send" width="18" />
+          </button>
           <VoiceControls onTranscribed={handleTranscribed} />
         </div>
 
