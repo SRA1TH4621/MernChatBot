@@ -2,13 +2,10 @@ const express = require("express");
 const router = express.Router();
 const historyController = require("../controllers/historyController");
 
-// 📜 Get all messages for a conversation
+// 📜 Get all messages for a conversation (by user + conversationId)
 router.get("/:userId/:conversationId", historyController.getHistory);
 
-// 💾 Save a new message
-router.post("/", historyController.addMessage);
-
-// 🗑 Clear a specific conversation
+// 🗑 Clear chat (delete all messages for a conversation)
 router.delete("/:userId/:conversationId", historyController.clearConversation);
 
 // 🗑 Clear ALL history for a user

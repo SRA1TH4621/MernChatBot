@@ -1,0 +1,74 @@
+import axios from "axios";
+
+const API_BASE = "http://localhost:5000/api"; // Change if backend runs elsewhere
+
+// ===============================
+// 🤖 CHAT & AI SERVICES
+// ===============================
+
+// ✅ Send a message to chatbot
+export const sendMessage = (message) =>
+  axios.post(`${API_BASE}/chat`, { message });
+
+// ✅ Speech-to-Text (Audio Transcription)
+export const transcribeAudio = (formData) =>
+  axios.post(`${API_BASE}/stt`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+
+// ✅ Text-to-Speech
+// ✅ Text-to-Speech (gTTS backend)
+export const fetchTTS = async (text, lang = "en") => {
+  const res = await axios.post(`${API_BASE}/tts`, { text, lang });
+  return res.data; // backend sends the mp3 url
+};
+
+// ✅ Vision/Image Analysis
+export const analyzeImage = (formData) =>
+  axios.post(`${API_BASE}/vision`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+
+// ✅ AI Image Generation
+// ✅ AI Image Generation (Frontend)
+export const generateImage = async (prompt) => {
+  const res = await axios.post(
+    `${API_BASE}/image`,
+    { prompt },
+    { responseType: "arraybuffer" }
+  );
+
+  // Browser-safe conversion (no Buffer)
+  const base64 = btoa(
+    new Uint8Array(res.data)
+      .reduce((data, byte) => data + String.fromCharCode(byte), "")
+  );
+
+  return { url: `data:image/png;base64,${base64}` };
+};
+
+// ✅ Save a note
+export const saveNote = (note) => axios.post(`${API_BASE}/notes`, { note });
+
+// ✅ Get all notes
+export const getNotes = () => axios.get(`${API_BASE}/notes`);
+
+// ===============================
+// 📜 HISTORY API (with userId + conversationId)
+// ===============================
+
+// ✅ Add message to a conversation
+export const addMessageToHistory = (userId, conversationId, sender, text) =>
+  axios.post(`${API_BASE}/history`, { userId, conversationId, sender, text });
+
+// ✅ Get all messages for a conversation
+export const getConversationHistory = (userId, conversationId) =>
+  axios.get(`${API_BASE}/history/${userId}/${conversationId}`);
+
+// ✅ Clear a specific conversation (for a user)
+export const clearConversation = (userId, conversationId) =>
+  axios.delete(`${API_BASE}/history/${userId}/${conversationId}`);
+
+// ✅ Clear ALL history for a user
+export const clearAllHistory = (userId) =>
+  axios.delete(`${API_BASE}/history/${userId}`);

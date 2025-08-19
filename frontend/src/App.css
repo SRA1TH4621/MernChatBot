@@ -1,42 +1,128 @@
+/* === Chat Container === */
 .chat-container {
   display: flex;
-  flex-direction: column;
   height: 100vh;
   background: #121212;
   color: #fff;
+  position: relative;
 }
 
+/* === Sidebar === */
+.sidebar {
+  width: 60px;
+  background: #1f1f1f;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 15px;
+  border-right: 1px solid #2c2c2c;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+}
+
+.sidebar button {
+  background: #1e88e5;
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.sidebar button:hover {
+  background: #1565c0;
+}
+
+/* === Main Chat Section === */
+.chat-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: 60px; /* space for sidebar */
+}
+
+/* === Header === */
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: #1f1f1f;
+  border-bottom: 1px solid #2c2c2c;
+}
+
+.chat-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.chat-header small {
+  color: #888;
+}
+
+.clear-btn {
+  background: transparent;
+  border: 1px solid #ff5252;
+  padding: 6px 12px;
+  border-radius: 8px;
+  color: #ff5252;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.clear-btn:hover {
+  background: #ff5252;
+  color: #fff;
+}
+
+/* === Messages Area === */
 .chat-messages {
   flex: 1;
   overflow-y: auto;
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* space between message groups */
+}
+
+.message-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.message-row.user {
+  justify-content: flex-end;
+}
+
+.message-row.bot {
+  justify-content: flex-start;
 }
 
 .chat-bubble {
-  display: flex;
-  align-items: center;
   padding: 10px 15px;
-  margin-bottom: 10px;
   border-radius: 15px;
-  max-width: 70%;
   word-wrap: break-word;
+  font-size: 0.95rem;
+  display: inline-block;
+  max-width: 70%;
 }
 
 .chat-bubble.user {
   background: #1e88e5;
-  align-self: flex-end;
   color: white;
 }
 
 .chat-bubble.bot {
-  background: #424242;
-  align-self: flex-start;
+  background: #2c2c2c;
+  color: white;
 }
 
-.icon {
-  margin-right: 10px;
-}
-
+/* === Typing Animation === */
 .typing .dot {
   height: 8px;
   width: 8px;
@@ -60,6 +146,7 @@
   100% { opacity: 0.2; }
 }
 
+/* === Input Bar === */
 .chat-input {
   display: flex;
   padding: 10px;
@@ -84,8 +171,14 @@
   background: #1e88e5;
   color: white;
   cursor: pointer;
+  transition: background 0.3s ease;
 }
 
+.chat-input button:hover {
+  background: #1565c0;
+}
+
+/* === Retry Button === */
 .retry-container {
   text-align: center;
   margin: 10px 0;
@@ -98,4 +191,187 @@
   background: #ff1744;
   color: white;
   cursor: pointer;
+}
+
+/* === Floating Plus Menu === */
+.plus-menu-container {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+}
+
+.plus-button {
+  background: #1e88e5;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 55px;
+  height: 55px;
+  font-size: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  transition: background 0.3s ease;
+}
+
+.plus-button:hover {
+  background: #1565c0;
+}
+
+.menu-options {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-bottom: 10px;
+  gap: 10px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.menu-options.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+}
+
+.menu-options button {
+  background: #2c2c2c;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.menu-options button:hover {
+  background: #444;
+}
+
+/* === History Drawer === */
+.history-drawer {
+  position: fixed;
+  top: 0;
+  left: -320px; /* hide offscreen */
+  width: 300px;
+  height: 100%;
+  background: #1f1f1f;
+  border-right: 1px solid #2c2c2c;
+  transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  color: white;
+  z-index: 999;
+  box-shadow: 2px 0 6px rgba(0,0,0,0.3);
+}
+
+.history-drawer.open {
+  left: 0; /* stops next to sidebar */
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: #2c2c2c;
+  border-bottom: 1px solid #333;
+}
+
+.history-header h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.history-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.history-clear-btn {
+  background: transparent;
+  border: none;
+  color: #ff5252;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.history-clear-btn:hover {
+  color: #ff7777;
+}
+
+.history-close-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.history-close-btn:hover {
+  color: #ff5252;
+}
+
+.history-content {
+  padding: 10px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* === Grouped History === */
+.history-group {
+  border-bottom: 1px solid #333;
+}
+
+.history-group-header {
+  cursor: pointer;
+  padding: 8px 12px;
+  background: #292929;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.history-group-header:hover {
+  background: #333;
+}
+
+.history-count {
+  color: #888;
+  font-size: 0.8rem;
+}
+
+.history-toggle {
+  font-size: 0.8rem;
+  color: #aaa;
+}
+
+.history-group-items {
+  padding: 6px 12px;
+}
+
+.history-item {
+  padding: 6px 0;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  font-size: 0.85rem;
+}
+
+.history-item:hover {
+  background: #292929;
+}
+
+.history-item-user {
+  color: #4dabf7;
+}
+
+.history-item-ai {
+  color: #81c784;
 }
