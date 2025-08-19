@@ -8,7 +8,17 @@ require("dotenv").config();
 
 const app = express();
 app.use(express.json());
-app.use(cors({ origin: "*", methods: ["GET", "POST"] }));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000", // for local dev
+      "https://mern-chat-bot-sigma.vercel.app/", // replace with your actual Vercel URL
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
+
 
 // Multer for file uploads
 const upload = multer({ storage: multer.memoryStorage() });
