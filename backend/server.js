@@ -11,8 +11,8 @@ app.use(express.json());
 app.use(
   cors({
     origin: [
-      "http://localhost:3000", // for local dev
-      "https://esmeray-1-pnsux0i0f-sra1th.vercel.app/", // replace with your actual Vercel URL
+      "http://localhost:3000",
+      "https://mern-chat-bot-sigma.vercel.app", // ✅ correct Vercel domain
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
