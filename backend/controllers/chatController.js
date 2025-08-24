@@ -14,6 +14,7 @@ const sendMessage = async (req, res) => {
       response.data?.[0]?.generated_text || "Sorry, I could not process that.";
     res.json({ reply: botReply });
   } catch (error) {
+    console.error("Chat error:", error.response?.data || error.message);
     res
       .status(500)
       .json({ error: "Failed to get response from Hugging Face API" });

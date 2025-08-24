@@ -54,6 +54,46 @@ export const saveNote = (note) => axios.post(`${API_BASE}/notes`, { note });
 // ✅ Get all notes
 export const getNotes = () => axios.get(`${API_BASE}/notes`);
 
+export const exportChatPDF = async (messages) => {
+  const res = await axios.post(
+    `${API_BASE}/export`,
+    { messages },
+    { responseType: "blob" }
+  );
+
+  const blob = new Blob([res.data], { type: "application/pdf" });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "chat.pdf";
+  a.click();
+};
+
+// === Fetch a random Studio Ghibli image ===
+export async function fetchGhibliImage() {
+  try {
+    // Studio Ghibli API (films) → we’ll fetch poster images
+    const res = await fetch("https://ghibliapi.vercel.app/films");
+    const data = await res.json();
+
+    if (data.length > 0) {
+      const randomFilm = data[Math.floor(Math.random() * data.length)];
+      return {
+        title: randomFilm.title,
+        image: randomFilm.image, // poster image
+      };
+    } else {
+      throw new Error("No Ghibli films found.");
+    }
+  } catch (err) {
+    console.error("Ghibli API Error:", err);
+    return null;
+  }
+}
+// === Image-to-Image Ghibli Conversion ===
+
+
+
 // ===============================
 // 📜 HISTORY API (with userId + conversationId)
 // ===============================

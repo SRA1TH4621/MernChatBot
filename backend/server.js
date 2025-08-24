@@ -5,6 +5,7 @@ const axios = require("axios");
 const multer = require("multer");
 const mongoose = require("mongoose");
 require("dotenv").config();
+const path = require("path");
 
 const app = express();
 app.use(express.json());
@@ -19,7 +20,6 @@ app.use(
   })
 );
 
-
 // Multer for file uploads
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -27,8 +27,10 @@ const upload = multer({ storage: multer.memoryStorage() });
 const sttController = require("./controllers/sttController");
 const ttsController = require("./controllers/ttsController");
 const visionController = require("./controllers/visionController");
+
+// Routes
 const imageGenRoutes = require("./routes/imageGen");
-const historyRoutes = require("./routes/historyRoutes"); // ✅ import added
+const historyRoutes = require("./routes/historyRoutes");
 
 // Environment Variables
 const PORT = process.env.PORT || 5000;
@@ -58,7 +60,7 @@ mongoose
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 // ✅ Routes
-app.use("/api/history", historyRoutes); // <-- history routes mounted
+app.use("/api/history", historyRoutes);
 app.use("/api", imageGenRoutes);
 
 // ✅ Root route
@@ -117,8 +119,6 @@ app.post(
 
 // ✅ TTS (Text to Speech)
 app.post("/api/tts", ttsController);
-// Serve static files for TTS audio
-const path = require("path");
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // ✅ Vision (Image Analysis)
@@ -131,6 +131,11 @@ app.post(
   },
   visionController
 );
+
+
+const exportRoutes = require("./routes/export");
+app.use("/api", exportRoutes);
+
 
 // ✅ Start server
 app.listen(PORT, () => {
