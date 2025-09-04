@@ -90,7 +90,32 @@ export async function fetchGhibliImage() {
     return null;
   }
 }
-// === Image-to-Image Ghibli Conversion ===
+
+// ✅ Weather API
+export const fetchWeather = async (city = "London") => {
+  try {
+    const res = await axios.get(`${API_BASE}/weather`, {
+      params: { city },
+    });
+    return res.data;
+  } catch (err) {
+    console.error("Weather fetch error:", err);
+    return null;
+  }
+};
+
+// ✅ News API
+export const fetchNews = async (topic = "general") => {
+  try {
+    const res = await axios.get(`${API_BASE}/news`, {
+      params: { topic },
+    });
+    return res.data;
+  } catch (err) {
+    console.error("News fetch error:", err);
+    return null;
+  }
+};
 
 
 

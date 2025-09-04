@@ -27,6 +27,8 @@ const upload = multer({ storage: multer.memoryStorage() });
 const sttController = require("./controllers/sttController");
 const ttsController = require("./controllers/ttsController");
 const visionController = require("./controllers/visionController");
+const weatherRoutes = require("./routes/weatherRoutes");
+const newsRoutes = require("./routes/newsRoutes");
 
 // Routes
 const imageGenRoutes = require("./routes/imageGen");
@@ -136,6 +138,8 @@ app.post(
 const exportRoutes = require("./routes/export");
 app.use("/api", exportRoutes);
 
+app.use("/api/weather", weatherRoutes);
+app.use("/api/news", newsRoutes);
 
 // ✅ Start server
 app.listen(PORT, () => {

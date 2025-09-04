@@ -1,26 +1,24 @@
+// App.js - Copilot-style layout
 import React, { useState, useEffect, useRef } from "react";
-import { sendMessage, generateImage, fetchTTS } from "./lib/api";
+import { sendMessage, generateImage } from "./lib/api";
 import VoiceControls from "./components/VoiceControls";
 import PlusMenu from "./components/PlusMenu";
 import HistoryDrawer from "./components/HistoryDrawer";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
-import jsPDF from "jspdf"; // ✅ For PDF Export
+import jsPDF from "jspdf";
+import confetti from "canvas-confetti";
+import { fetchWeather, fetchNews } from "./lib/api";
 
 import "./App.css";
 
-// === ICON IMPORTS ===
-import ChatbotIcon from "./icons/chatbot.svg";
+// === ICONS ===
 import HistoryIcon from "./icons/history.svg";
-import ClearIcon from "./icons/clear.svg";
-import SendIcon from "./icons/send.svg";
 import RetryIcon from "./icons/retry.svg";
-import CopyIcon from "./icons/copy.svg";
-import SoundIcon from "./icons/sound.svg";
 import DownloadIcon from "./icons/download.svg";
-import PdfIcon from "./icons/pdf.svg";
-import TxtIcon from "./icons/txt.svg";
+import SendIcon from "./icons/send.svg";
+import ThemeIcon from "./icons/theme.png";
 
 function App() {
   const [messages, setMessages] = useState([]);
@@ -29,54 +27,50 @@ function App() {
   const [retryMessage, setRetryMessage] = useState(null);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [chatHistory, setChatHistory] = useState([]);
-  const [lightboxImage, setLightboxImage] = useState(null);
-  const [theme, setTheme] = useState("dark");
-  const [fontSize, setFontSize] = useState(16);
-  const messagesEndRef = useRef(null);
+  const [hasStarted, setHasStarted] = useState(false);
   const [toast, setToast] = useState(null);
+  const [theme, setTheme] = useState("light");
+  const [loading, setLoading] = useState(false);
 
-  const fonts = [
-    "Arial, sans-serif",
-    "Verdana, sans-serif",
-    "Tahoma, sans-serif",
-    "'Courier New', monospace",
-    "'Trebuchet MS', sans-serif",
-    "'Comic Sans MS', cursive",
-    "'Lucida Console', monospace",
-    "'Georgia', serif",
-    "'Times New Roman', serif",
-    "'Garamond', serif",
-    "'Palatino Linotype', serif",
-    "'Brush Script MT', cursive",
-    "'Segoe UI', sans-serif",
-    "'Roboto', sans-serif",
-    "'Poppins', sans-serif",
-    "'Montserrat', sans-serif",
-    "'Raleway', sans-serif",
-    "'Merriweather', serif",
-    "'Playfair Display', serif",
-    "'Dancing Script', cursive",
-    "'Indie Flower', cursive",
-    "'Pacifico', cursive",
-    "'Orbitron', sans-serif",
-    "'Press Start 2P', cursive",
+  const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
+
+  // Suggestions
+
+  const inlineSuggestions = [
+    "🌦 Get Weather",
+    "📰 Latest News",
+    "Create an image",
+    "Improve writing",
+    "Draft a text",
   ];
 
+  // Celebration confetti
+  const triggerCelebration = () => {
+    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+  };
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  };
+  // Startup message
   useEffect(() => {
     setMessages([
-      {
-        sender: "bot",
-        text: "👋 Hi! I'm Esmeray 2.0 — your AI assistant. How can I help you today?",
-      },
+      { sender: "bot", text: "👋 Hi! I'm Esmeray 2.0 — your AI assistant." },
     ]);
-
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    setTheme(mq.matches ? "dark" : "lightpink");
-    const handleChange = (e) => setTheme(e.matches ? "dark" : "lightpink");
-    mq.addEventListener("change", handleChange);
-    return () => mq.removeEventListener("change", handleChange);
+    triggerCelebration();
   }, []);
 
+  // Smooth scroll
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, typing]);
+
+  // Typewriter effect
   const typeMessage = (text) => {
     let i = 0;
     setTyping(true);
@@ -103,11 +97,16 @@ function App() {
     }, 25);
   };
 
+  // === Send ===
   const handleSend = async (retryInput = null) => {
     const userInput = retryInput || input.trim();
     if (!userInput) return;
+    if (!hasStarted) setHasStarted(true);
 
-    // === Handle /img command ===
+    setInput(""); // clear instantly like Copilot
+    inputRef.current?.blur();
+
+    // /img command
     if (userInput.startsWith("/img")) {
       const promptText = userInput.replace("/img", "").trim();
       if (!promptText) return;
@@ -115,16 +114,16 @@ function App() {
         ...prev,
         { sender: "user", text: `🎨 Generate: ${promptText}` },
       ]);
-      setInput("");
       setTyping(true);
-
       try {
         const res = await generateImage(promptText);
         setMessages((prev) => [
           ...prev,
           { sender: "bot", text: "🖼 Image generated:", image: res.url },
         ]);
-      } catch {
+        triggerCelebration();
+      } catch (err) {
+        console.error("Image Gen Error:", err);
         setMessages((prev) => [
           ...prev,
           { sender: "bot", text: "❗ Failed to generate image." },
@@ -135,41 +134,13 @@ function App() {
       return;
     }
 
-    // === Normal Chat Flow ===
+    // Normal chat
     setMessages((prev) => [...prev, { sender: "user", text: userInput }]);
-    setInput("");
     setTyping(true);
     setRetryMessage(null);
-
     try {
       const res = await sendMessage(userInput);
-
-      // === Handle /gif command ===
-      if (res.data.response.startsWith("/gif")) {
-        const query = res.data.response.replace("/gif", "").trim();
-        try {
-          const gifRes = await fetch(
-            `https://api.giphy.com/v1/gifs/search?api_key=YOUR_GIPHY_API_KEY&q=${query}&limit=5`
-          );
-          const gifData = await gifRes.json();
-          const gifList = gifData.data.map(
-            (g) => g.images?.downsized_medium?.url
-          );
-          setMessages((prev) => [
-            ...prev,
-            { sender: "bot", type: "gif-selection", gifs: gifList },
-          ]);
-        } catch {
-          setMessages((prev) => [
-            ...prev,
-            { sender: "bot", text: "❗ Failed to fetch GIFs." },
-          ]);
-        } finally {
-          setTyping(false);
-        }
-      } else {
-        typeMessage(res.data.response);
-      }
+      typeMessage(res.data.response);
     } catch {
       setRetryMessage(userInput);
       typeMessage("❗ Failed to get response. Please Retry.");
@@ -178,83 +149,85 @@ function App() {
 
   const handleRetry = () => retryMessage && handleSend(retryMessage);
 
-  const handleClearChat = () => {
-    setMessages([
-      { sender: "bot", text: "👋 Hi! I'm Esmeray 2.0 — starting fresh!" },
+  // === PlusMenu Handlers ===
+  const handleImageUpload = (file) => {
+    const url = URL.createObjectURL(file);
+    setHasStarted(true);
+    setMessages((prev) => [
+      ...prev,
+      { sender: "user", text: "📤 Uploaded an image:", image: url },
     ]);
-    setChatHistory([]);
-    setRetryMessage(null);
   };
 
-  const handleClearHistory = () => {
-    setChatHistory([]);
-    setMessages([
-      { sender: "bot", text: "👋 Hi! I'm Esmeray 2.0 — all history cleared." },
-    ]);
-    setRetryMessage(null);
-  };
+  const handleImageGen = async (prompt) => {
+    if (!prompt) return;
+    setHasStarted(true);
 
-  const handleTranscribed = (text) => setInput(text);
+    // Add user bubble
+    setMessages((prev) => [...prev, { sender: "user", text: `🎨 ${prompt}` }]);
+    setTyping(true);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, typing]);
-
-  const handleSelectHistory = (item) => {
-    setMessages(
-      item.fullChat?.length > 0
-        ? item.fullChat
-        : [{ sender: "bot", text: "👋 Hi! I'm Esmeray — ready again!" }]
-    );
-    setHistoryOpen(false);
-  };
-
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "dark" ? "lightpink" : "dark"));
-    const randomFont = fonts[Math.floor(Math.random() * fonts.length)];
-    document.body.style.fontFamily = randomFont;
-    setToast(
-      `Theme: ${
-        theme === "dark" ? "🌸 Pink Gradient" : "🌌 Dark Gradient"
-      } | Font: ${randomFont.replace(/['"]+/g, "")}`
-    );
-    setTimeout(() => setToast(null), 2000);
-  };
-
-  const increaseFont = () => setFontSize((s) => Math.min(s + 2, 28));
-  const decreaseFont = () => setFontSize((s) => Math.max(s - 2, 12));
-
-  // === Export Chat as PDF ===
-  const handleExportPDF = () => {
     try {
-      const doc = new jsPDF();
-      let y = 10;
-
-      messages.forEach((msg) => {
-        const sender = msg.sender === "user" ? "🧑 You:" : "🤖 Bot:";
-        doc.text(`${sender} ${msg.text || ""}`, 10, y);
-        y += 10;
-        if (y > 280) {
-          doc.addPage();
-          y = 10;
-        }
-      });
-
-      doc.save("chat-history.pdf");
-    } catch (err) {
-      alert("❌ PDF export failed. Try TXT export instead.");
+      const res = await generateImage(prompt);
+      setMessages((prev) => [
+        ...prev,
+        { sender: "bot", text: "🖼 Image generated:", image: res.url },
+      ]);
+      triggerCelebration();
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        { sender: "bot", text: "❗ Failed to generate image." },
+      ]);
+    } finally {
+      setTyping(false);
     }
   };
 
-  // === Export Chat as TXT ===
+  const handleGifGen = (gifList) => {
+    setHasStarted(true);
+    setMessages((prev) => [
+      ...prev,
+      { sender: "user", text: "🔎 Searching GIFs..." },
+      { sender: "bot", text: "Here are some GIFs:", gifs: gifList },
+    ]);
+  };
+
+  const handleGhibliGen = (res) => {
+    setHasStarted(true);
+    setMessages((prev) => [
+      ...prev,
+      { sender: "user", text: "🎬 Show me a Ghibli image" },
+      { sender: "bot", text: `🌸 From: ${res.title}`, image: res.image },
+    ]);
+  };
+
+  // Export PDF
+  const handleExportPDF = () => {
+    const doc = new jsPDF();
+    let y = 10;
+    messages.forEach((msg) => {
+      const sender = msg.sender === "user" ? "🧑 You:" : "🤖 Bot:";
+      doc.text(`${sender} ${msg.text || ""}`, 10, y);
+      y += 10;
+      if (msg.image) {
+        try {
+          doc.addImage(msg.image, "PNG", 10, y, 80, 60);
+          y += 70;
+        } catch {}
+      }
+    });
+    doc.save("chat-history.pdf");
+  };
+
+  // Export TXT
   const handleExportTXT = () => {
     const text = messages
-      .map((msg) => {
-        const sender = msg.sender === "user" ? "🧑 You:" : "🤖 Bot:";
-        return `${sender} ${msg.text || ""}`;
-      })
+      .map(
+        (msg) =>
+          `${msg.sender === "user" ? "🧑 You:" : "🤖 Bot:"} ${msg.text || ""}`
+      )
       .join("\n\n");
-
     const blob = new Blob([text], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -263,58 +236,185 @@ function App() {
     a.click();
     URL.revokeObjectURL(url);
   };
+  // 🌦 Weather Handler
+  const handleWeather = async () => {
+    const city = window.prompt("Enter a city for weather:");
+    if (!city) return; // cancel if user presses "Cancel"
+
+    setHasStarted(true);
+    setMessages((prev) => [
+      ...prev,
+      { sender: "user", text: `🌦 Get Weather for ${city}` },
+    ]);
+    setTyping(true);
+
+    try {
+      const res = await fetchWeather(city);
+      if (res && res.location) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            sender: "bot",
+            weather: {
+              city: res.location,
+              country: res.country,
+              temp_c: res.temperature_c,
+              condition: res.condition,
+              icon: res.icon,
+              feelslike_c: res.feelslike_c,
+              humidity: res.humidity,
+              wind_kph: res.wind_kph,
+            },
+          },
+        ]);
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          { sender: "bot", text: "❌ Weather not found." },
+        ]);
+      }
+    } catch (err) {
+      console.error("Weather Error:", err);
+      setMessages((prev) => [
+        ...prev,
+        { sender: "bot", text: "⚠️ Error fetching weather." },
+      ]);
+    } finally {
+      setTyping(false);
+    }
+  };
+
+  // 📰 News Handler
+  const handleNews = async (topic = "technology") => {
+    setHasStarted(true);
+    setMessages((prev) => [
+      ...prev,
+      { sender: "user", text: `📰 Latest News on ${topic}` },
+    ]);
+    setTyping(true);
+
+    try {
+      const res = await fetchNews(topic);
+      if (res?.articles?.length) {
+        const topArticles = res.articles.slice(0, 10); // show 10 articles
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            sender: "bot",
+            news: topArticles.map((a) => ({
+              title: a.title,
+              url: a.url,
+              image: a.urlToImage,
+              source: a.source?.name,
+            })),
+          },
+        ]);
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          { sender: "bot", text: "❌ No news found." },
+        ]);
+      }
+    } catch (err) {
+      setMessages((prev) => [
+        ...prev,
+        { sender: "bot", text: "⚠️ Error fetching news." },
+      ]);
+    } finally {
+      setTyping(false);
+    }
+  };
 
   return (
-    <div className={`chat-container theme-${theme}`}>
-      <div className="sidebar">
-        <button onClick={() => setHistoryOpen(true)} title="History">
-          <img src={HistoryIcon} alt="History" width="22" />
-        </button>
-
-        <button onClick={handleExportPDF} title="Export PDF">
-          <img src={PdfIcon} alt="Export PDF" width="22" />
-        </button>
-
-        <button onClick={handleExportTXT} title="Export TXT">
-          <img src={TxtIcon} alt="Export TXT" width="22" />
-        </button>
+    <div className="copilot-container">
+      {/* Cosmic Background */}
+      <div className="cosmic-bg">
+        
+        <div className="stars"></div> {/* global stars */}
+        <div className="moon-wrapper">
+          <div className="moon"></div>
+          <div className="moon-stars"></div> {/* halo stars */}
+        </div>
       </div>
 
-      {/* === MAIN CHAT === */}
-      <div className="chat-main">
-        <div className="chat-header">
-          <h2>
-            <img src={ChatbotIcon} alt="Chatbot" width="24" /> Esmeray Chatbot
-          </h2>
-          <small> Esmeray 2.0 – AI Assistant</small>
-          <div className="header-actions">
-            <button className="theme-btn" onClick={toggleTheme}>
-              🎨 Theme
+      {/* Sidebar button – only show if history is closed */}
+      {!historyOpen && (
+        <div className="sidebar-btn">
+          <button onClick={() => setHistoryOpen(true)} title="History">
+            <img src={HistoryIcon} alt="History" width="24" />
+          </button>
+          <button onClick={toggleTheme} title="Toggle Theme">
+            <img src={ThemeIcon} alt="Theme" width="22" />
+          </button>
+        </div>
+      )}
+
+      {/* === Welcome State === */}
+      {!hasStarted ? (
+        <div className="welcome-screen">
+          <div className="stars"></div> {/* twinkling stars */}
+          <div className="moon"></div> {/* main glowing moon */}
+          <h2>Hi User, what should we dive into today?</h2>
+          <div
+            className="chat-input"
+            style={{ maxWidth: "700px", width: "100%" }}
+          >
+            <PlusMenu
+              onImageUpload={handleImageUpload}
+              onImageGen={handleImageGen}
+              onGifGen={handleGifGen}
+              onGhibliGen={handleGhibliGen}
+            />
+            <input
+              ref={inputRef}
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Message Copilot..."
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSend();
+                }
+              }}
+            />
+            <button onClick={handleSend}>
+              <img src={SendIcon} alt="Send" width="18" />
             </button>
-            <button className="theme-btn" onClick={decreaseFont}>
-              A-
-            </button>
-            <button className="theme-btn" onClick={increaseFont}>
-              A+
-            </button>
-            <button className="clear-btn" onClick={handleClearChat}>
-              <img src={ClearIcon} alt="Clear" width="18" /> Clear Chat
-            </button>
+            <VoiceControls onTranscribed={(text) => setInput(text)} />
+          </div>
+          {/* Suggestions */}
+          <div className="suggestions">
+            {inlineSuggestions.map((s, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  if (s === "Create an image") {
+                    const prompt = window.prompt(
+                      "Enter a prompt for image generation:"
+                    );
+                    if (prompt) handleImageGen(prompt);
+                  } else if (s === "🌦 Get Weather") {
+                    handleWeather(); // ✅ now works
+                  } else if (s === "📰 Latest News") {
+                    handleNews(); // ✅ now works
+                  } else {
+                    handleSend(s);
+                  }
+                }}
+              >
+                {s}
+              </button>
+            ))}
           </div>
         </div>
-
-        {/* === CHAT MESSAGES === */}
-        <div className="chat-messages">
-          {messages.map((msg, i) => (
-            <div
-              key={i}
-              className={`chat-bubble ${msg.sender} ${
-                msg.typingText ? "typing-text" : ""
-              }`}
-              style={{ fontSize: `${fontSize}px` }}
-            >
-              {/* === Normal text === */}
-              {msg.type !== "gif-selection" && (
+      ) : (
+        <>
+          {/* Chat messages */}
+          <div className="chat-messages">
+            {messages.map((msg, i) => (
+              <div key={i} className={`chat-bubble ${msg.sender}`}>
                 <ReactMarkdown
                   components={{
                     code({ inline, className, children, ...props }) {
@@ -338,264 +438,168 @@ function App() {
                 >
                   {msg.text}
                 </ReactMarkdown>
-              )}
-
-              {/* === Bot actions (sound / copy) === */}
-              {msg.sender === "bot" &&
-                msg.text &&
-                msg.type !== "gif-selection" && (
-                  <div className="message-actions">
-                    <button
-                      className="icon-btn"
-                      title="Play Sound"
-                      onClick={async () => {
-                        try {
-                          const audioUrl = await fetchTTS(msg.text, "en");
-                          new Audio(audioUrl).play();
-                        } catch {
-                          alert("❌ Failed to play speech");
-                        }
-                      }}
-                    >
-                      <img src={SoundIcon} alt="Sound" width="18" />
-                    </button>
-                    <button
-                      className="icon-btn"
-                      title="Copy to Clipboard"
-                      onClick={() => {
-                        navigator.clipboard.writeText(msg.text);
-                        setToast("✅ Copied!");
-                        setTimeout(() => setToast(null), 1500);
-                      }}
-                    >
-                      <img src={CopyIcon} alt="Copy" width="18" />
-                    </button>
-                  </div>
-                )}
-
-              {/* === Single Image/GIF === */}
-              {msg.image && (
-                <div className="chat-image-wrapper">
-                  <div
-                    className="chat-image"
-                    onClick={() => setLightboxImage(msg.image)}
-                    style={{ cursor: "pointer" }}
-                  >
+                {msg.image && (
+                  <div className="chat-image">
                     <img src={msg.image} alt="generated" width="250" />
-                  </div>
-                  <div className="message-actions">
-                    <button
-                      className="icon-btn"
-                      title="Copy Image URL"
-                      onClick={() => {
-                        navigator.clipboard.writeText(msg.image);
-                        setToast("✅ Image URL copied!");
-                        setTimeout(() => setToast(null), 1500);
-                      }}
-                    >
-                      <img src={CopyIcon} alt="Copy" width="18" />
-                    </button>
-                    <a
-                      href={msg.image}
-                      download="generated-image.png"
-                      className="icon-btn"
-                      title="Download Image"
-                    >
+                    <a href={msg.image} download="generated.png">
                       <img src={DownloadIcon} alt="Download" width="18" />
                     </a>
                   </div>
-                </div>
-              )}
-
-              {/* === GIF Selection Row === */}
-              {msg.type === "gif-selection" && (
-                <div className="gif-selection">
-                  {msg.gifs.map((gif, idx) => (
+                )}
+                {msg.icon && (
+                  <div className="chat-weather">
                     <img
-                      key={idx}
-                      src={gif}
-                      alt="gif-option"
-                      style={{ cursor: "pointer" }}
-                      onClick={async () => {
-                        // 1. Replace selection with chosen GIF
-                        setMessages((prev) => [
-                          ...prev.filter((m) => m.type !== "gif-selection"),
-                          { sender: "user", type: "gif", image: gif },
-                        ]);
-
-                        // 2. Fetch & download directly
-                        try {
-                          const res = await fetch(gif);
-                          const blob = await res.blob();
-                          const url = URL.createObjectURL(blob);
-
-                          const a = document.createElement("a");
-                          a.href = url;
-                          a.download = `giphy-${idx + 1}.gif`;
-                          document.body.appendChild(a);
-                          a.click();
-                          document.body.removeChild(a);
-
-                          URL.revokeObjectURL(url);
-
-                          setToast("💾 GIF downloaded!");
-                          setTimeout(() => setToast(null), 1500);
-                        } catch (err) {
-                          console.error("GIF Download Failed:", err);
-                          setToast("❌ Failed to download GIF");
-                          setTimeout(() => setToast(null), 1500);
-                        }
-                      }}
+                      src={msg.icon}
+                      alt="weather icon"
+                      width="48"
+                      height="48"
                     />
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
+                  </div>
+                )}
+                {msg.weather && (
+                  <div className="glass-card weather-card">
+                    {msg.weather.icon && (
+                      <img
+                        src={msg.weather.icon}
+                        alt="weather"
+                        className="weather-icon"
+                      />
+                    )}
+                    <div className="weather-info">
+                      <h4>
+                        {msg.weather.city}, {msg.weather.country}
+                      </h4>
+                      <p>
+                        🌡 {msg.weather.temp_c}°C (Feels like{" "}
+                        {msg.weather.feelslike_c}°C)
+                      </p>
+                      <p>☁ {msg.weather.condition}</p>
+                      <p>💧 Humidity: {msg.weather.humidity}%</p>
+                      <p>💨 Wind: {msg.weather.wind_kph} kph</p>
+                    </div>
+                  </div>
+                )}
 
-          {typing && (
-            <div
-              className="chat-bubble bot typing"
-              style={{ fontSize: `${fontSize}px` }}
-            >
-              🤖 <span className="dot"></span>
-              <span className="dot"></span>
-              <span className="dot"></span>
-            </div>
-          )}
+                {msg.news && (
+                  <div className="chat-news">
+                    {msg.news.map((article, i) => (
+                      <div key={i} className="glass-card news-card">
+                        {article.image && (
+                          <img
+                            src={article.image}
+                            alt={article.title}
+                            className="news-image"
+                          />
+                        )}
+                        <div className="news-content">
+                          <h4>{article.title}</h4>
+                          <p>{article.source || "Unknown Source"}</p>
+                          <a
+                            href={article.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            🔗 Read More
+                          </a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
-          {retryMessage && (
-            <div className="retry-container">
-              <button onClick={handleRetry}>
-                <img src={RetryIcon} alt="Retry" width="18" /> Retry
-              </button>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
+                {msg.gifs && (
+                  <div className="chat-gifs">
+                    {msg.gifs.map((gif, j) => (
+                      <img key={j} src={gif} alt="gif" width="120" />
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
 
-        {/* === CHAT INPUT === */}
-        <div className="chat-input">
-          <PlusMenu
-            onImageUpload={() => {
-              const inputEl = document.createElement("input");
-              inputEl.type = "file";
-              inputEl.accept = "image/*";
-              inputEl.onchange = (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = () => {
-                  setMessages((prev) => [
-                    ...prev,
-                    {
-                      sender: "user",
-                      text: "📤 Uploaded an image:",
-                      image: reader.result,
-                    },
-                  ]);
-                };
-                reader.readAsDataURL(file);
-              };
-              inputEl.click();
-            }}
-            onImageGen={() => {
-              const promptText = prompt("Enter a prompt to generate an image:");
-              if (!promptText) return;
-              setMessages((prev) => [
-                ...prev,
-                { sender: "user", text: `🎨 Generate: ${promptText}` },
-              ]);
-              setTyping(true);
-              generateImage(promptText)
-                .then((res) =>
-                  setMessages((prev) => [
-                    ...prev,
-                    {
-                      sender: "bot",
-                      text: "🖼 Image generated:",
-                      image: res.url,
-                    },
-                  ])
-                )
-                .catch(() =>
-                  setMessages((prev) => [
-                    ...prev,
-                    { sender: "bot", text: "❗ Failed to generate image." },
-                  ])
-                )
-                .finally(() => setTyping(false));
-            }}
-            onGifGen={(gifList) => {
-              setMessages((prev) => [
-                ...prev,
-                { sender: "bot", type: "gif-selection", gifs: gifList },
-              ]);
-            }}
-            onGhibliGen={(res) => {
-              setMessages((prev) => [
-                ...prev,
-                {
-                  sender: "bot",
-                  text: `🌸 Studio Ghibli: ${res.title}`,
-                  image: res.image,
-                },
-              ]);
-            }}
-          />
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Type your message..."
-            onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            style={{ fontSize: `${fontSize}px` }}
-          />
-          <button onClick={() => handleSend()}>
-            <img src={SendIcon} alt="Send" width="18" />
-          </button>
-          <VoiceControls onTranscribed={handleTranscribed} />
-        </div>
+            {typing && (
+              <div className="chat-bubble bot typing">
+                🤖 <span className="dot"></span>
+                <span className="dot"></span>
+                <span className="dot"></span>
+              </div>
+            )}
 
-        <HistoryDrawer
-          open={historyOpen}
-          onClose={() => setHistoryOpen(false)}
-          history={chatHistory}
-          onSelectHistory={handleSelectHistory}
-          onClearHistory={handleClearHistory}
-        />
+            {retryMessage && (
+              <div className="retry-container">
+                <button onClick={handleRetry}>
+                  <img src={RetryIcon} alt="Retry" width="18" /> Retry
+                </button>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
 
-        {lightboxImage && (
-          <div
-            className="lightbox"
-            onClick={() => setLightboxImage(null)}
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              background: "rgba(0,0,0,0.8)",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              zIndex: 9999,
-            }}
-          >
-            <img
-              src={lightboxImage}
-              alt="Full View"
-              style={{
-                maxWidth: "90%",
-                maxHeight: "90%",
-                borderRadius: "10px",
+          {/* Input at bottom */}
+          <div className="chat-input">
+            <PlusMenu
+              onImageUpload={handleImageUpload}
+              onImageGen={handleImageGen}
+              onGifGen={handleGifGen}
+              onGhibliGen={handleGhibliGen}
+            />
+            <input
+              ref={inputRef}
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Message Copilot..."
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSend();
+                }
               }}
             />
+            <button onClick={handleSend}>
+              <img src={SendIcon} alt="Send" width="18" />
+            </button>
+            <VoiceControls onTranscribed={(text) => setInput(text)} />
           </div>
-        )}
 
-        {toast && <div className="toast">{toast}</div>}
-      </div>
+          {/* Suggestions */}
+          {/* Suggestions */}
+          {!hasStarted && !input && !typing && (
+            <div className="suggestions">
+              {inlineSuggestions.map((s, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    if (s === "Create an image") {
+                      // 🖼 Directly open image generation flow
+                      const prompt = window.prompt(
+                        "Enter a prompt for image generation:"
+                      );
+                      if (prompt) handleImageGen(prompt);
+                    } else {
+                      handleSend(s);
+                    }
+                  }}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* History Drawer */}
+      <HistoryDrawer
+        open={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+        history={chatHistory}
+        onSelectHistory={(item) => setMessages(item.fullChat || [])}
+        onClearHistory={() => setChatHistory([])}
+      />
+
+      {/* Toast */}
+      {toast && <div className="toast">{toast}</div>}
     </div>
   );
 }

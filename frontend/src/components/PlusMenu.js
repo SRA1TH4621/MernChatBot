@@ -1,50 +1,68 @@
-import React, { useState } from "react";
-import { fetchTTS, fetchGhibliImage } from "../lib/api"; // ✅ add Ghibli API
+import React, { useState, useRef } from "react";
+import { fetchTTS, fetchGhibliImage, generateImage } from "../lib/api";
 
-// === ICON IMPORTS ===
+// === ICONS ===
 import UploadIcon from "../icons/upload.svg";
 import GenerateIcon from "../icons/generate.svg";
 import TTSIcon from "../icons/tts.svg";
-import GifIcon from "../icons/gif.svg"; // 🔥 GIF icon
-import GhibliIcon from "../icons/ghibli.svg"; // 🎬 NEW: Add a Ghibli icon (create/download SVG)
+import GifIcon from "../icons/gif.svg";
+import GhibliIcon from "../icons/ghibli.svg";
 import PlusIcon from "../icons/plus.svg";
 import CloseIcon from "../icons/close.svg";
 
 function PlusMenu({ onImageUpload, onImageGen, onGifGen, onGhibliGen }) {
   const [open, setOpen] = useState(false);
+  const fileInputRef = useRef(null);
 
-  // ✅ Handle TTS request
+  // === Upload Image ===
+  const handleUpload = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) onImageUpload(file);
+  };
+
+  // === Generate Image ===
+  const handleImageGen = () => {
+    const prompt = window.prompt("Enter a prompt for image generation:");
+    if (!prompt) return;
+    onImageGen(prompt); // ✅ just send prompt to App.js
+    setOpen(false);
+  };
+
+
+  // === Text-to-Speech ===
   const handleTTS = async () => {
     const text = prompt("Enter text to speak:");
     if (!text) return;
-
     try {
       const res = await fetchTTS(text, "en");
       if (res.audioUrl) {
         const audio = new Audio(res.audioUrl);
-        audio.play().catch((err) => console.error("Audio play error:", err));
+        audio.play();
       }
     } catch (err) {
       console.error("TTS Error:", err);
-      alert("❌ Failed to generate speech.");
+      alert("❌ TTS failed.");
     }
+    setOpen(false);
   };
 
-  // ✅ Handle GIF request (multiple)
+  // === GIF Search ===
   const handleGIF = async () => {
     const keyword = prompt("Enter a keyword for GIF:");
     if (!keyword) return;
-
     try {
-      const apiKey = "MZbjqUJw2qOzr50I2AfZQ7hVUyFDb4kK"; // ⚠️ Replace with your Giphy API key
+      const apiKey = "MZbjqUJw2qOzr50I2AfZQ7hVUyFDb4kK"; // Replace with your Giphy API key
       const res = await fetch(
         `https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${keyword}&limit=5`
       );
       const data = await res.json();
-
       if (data.data.length > 0) {
         const gifList = data.data.map((gif) => gif.images.fixed_height.url);
-        onGifGen(gifList); // send all results back to App.js
+        onGifGen(gifList);
       } else {
         alert("❌ No GIF found!");
       }
@@ -52,28 +70,39 @@ function PlusMenu({ onImageUpload, onImageGen, onGifGen, onGhibliGen }) {
       console.error("GIF Error:", err);
       alert("❌ Failed to fetch GIFs.");
     }
+    setOpen(false);
   };
 
-  // ✅ Handle Ghibli Image request
+  // === Ghibli Image ===
   const handleGhibli = async () => {
     try {
       const res = await fetchGhibliImage();
       if (res) {
-        onGhibliGen(res); // send {title, image} to App.js
+        onGhibliGen(res);
       } else {
-        alert("❌ Failed to fetch Ghibli image.");
+        alert("❌ No Ghibli image found.");
       }
     } catch (err) {
       console.error("Ghibli Error:", err);
-      alert("❌ Ghibli image fetch failed.");
+      alert("❌ Ghibli fetch failed.");
     }
+    setOpen(false);
   };
 
   return (
     <div className="plusmenu-wrapper">
-      {/* Plus button inside input bar */}
+      {/* Hidden file input for uploads */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        style={{ display: "none" }}
+        accept="image/*"
+        onChange={handleFileChange}
+      />
+
+      {/* Toggle Button */}
       <button
-        className={`plus-button ${open ? "open" : ""}`}
+        className="plus-button"
         onClick={() => setOpen((prev) => !prev)}
         title="More options"
       >
@@ -83,55 +112,20 @@ function PlusMenu({ onImageUpload, onImageGen, onGifGen, onGhibliGen }) {
       {/* Dropdown Menu */}
       {open && (
         <div className="plusmenu-dropdown">
-          <button onClick={onImageUpload}>
-            <img
-              src={UploadIcon}
-              alt="Upload"
-              width="18"
-              style={{ marginRight: "6px" }}
-            />
-            Upload Image
+          <button onClick={handleUpload}>
+            <img src={UploadIcon} alt="Upload" width="18" /> Upload Image
           </button>
-
-          <button onClick={onImageGen}>
-            <img
-              src={GenerateIcon}
-              alt="Generate"
-              width="18"
-              style={{ marginRight: "6px" }}
-            />
-            Generate Image
+          <button onClick={handleImageGen}>
+            <img src={GenerateIcon} alt="Gen" width="18" /> Generate Image
           </button>
-
           <button onClick={handleTTS}>
-            <img
-              src={TTSIcon}
-              alt="TTS"
-              width="18"
-              style={{ marginRight: "6px" }}
-            />
-            Text-to-Speech
+            <img src={TTSIcon} alt="TTS" width="18" /> Text-to-Speech
           </button>
-
           <button onClick={handleGIF}>
-            <img
-              src={GifIcon}
-              alt="GIF"
-              width="18"
-              style={{ marginRight: "6px" }}
-            />
-            Search GIFs
+            <img src={GifIcon} alt="GIF" width="18" /> Search GIFs
           </button>
-
-          {/* 🎬 New Ghibli Button */}
           <button onClick={handleGhibli}>
-            <img
-              src={GhibliIcon}
-              alt="Ghibli"
-              width="18"
-              style={{ marginRight: "6px" }}
-            />
-            Ghibli Image
+            <img src={GhibliIcon} alt="Ghibli" width="18" /> Ghibli Image
           </button>
         </div>
       )}
