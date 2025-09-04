@@ -330,7 +330,6 @@ function App() {
     <div className="copilot-container">
       {/* Cosmic Background */}
       <div className="cosmic-bg">
-        
         <div className="stars"></div> {/* global stars */}
         <div className="moon-wrapper">
           <div className="moon"></div>
@@ -353,9 +352,15 @@ function App() {
       {/* === Welcome State === */}
       {!hasStarted ? (
         <div className="welcome-screen">
+          <h1 className="moon-title-behind">
+            {theme === "dark" ? "Esmeray" : "Eclipse"}
+          </h1>
           <div className="stars"></div> {/* twinkling stars */}
-          <div className="moon"></div> {/* main glowing moon */}
-          <h2>Hi User, what should we dive into today?</h2>
+          {/* Moon + Title */}
+          <div className="moon-scene">
+            <div className="moon"></div>
+          </div>
+          {/* Input Field */}
           <div
             className="chat-input"
             style={{ maxWidth: "700px", width: "100%" }}
@@ -371,7 +376,7 @@ function App() {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Message Copilot..."
+              placeholder="Ask Anything..."
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -379,7 +384,14 @@ function App() {
                 }
               }}
             />
-            <button onClick={handleSend}>
+            <button
+              onClick={() => {
+                if (input.trim()) {
+                  handleSend();
+                  setHasStarted(true); // ✅ ensures chat opens after first send
+                }
+              }}
+            >
               <img src={SendIcon} alt="Send" width="18" />
             </button>
             <VoiceControls onTranscribed={(text) => setInput(text)} />
@@ -394,13 +406,19 @@ function App() {
                     const prompt = window.prompt(
                       "Enter a prompt for image generation:"
                     );
-                    if (prompt) handleImageGen(prompt);
+                    if (prompt) {
+                      handleImageGen(prompt);
+                      setHasStarted(true);
+                    }
                   } else if (s === "🌦 Get Weather") {
-                    handleWeather(); // ✅ now works
+                    handleWeather();
+                    setHasStarted(true);
                   } else if (s === "📰 Latest News") {
-                    handleNews(); // ✅ now works
+                    handleNews();
+                    setHasStarted(true);
                   } else {
                     handleSend(s);
+                    setHasStarted(true);
                   }
                 }}
               >
@@ -438,6 +456,8 @@ function App() {
                 >
                   {msg.text}
                 </ReactMarkdown>
+
+                {/* Images */}
                 {msg.image && (
                   <div className="chat-image">
                     <img src={msg.image} alt="generated" width="250" />
@@ -446,16 +466,8 @@ function App() {
                     </a>
                   </div>
                 )}
-                {msg.icon && (
-                  <div className="chat-weather">
-                    <img
-                      src={msg.icon}
-                      alt="weather icon"
-                      width="48"
-                      height="48"
-                    />
-                  </div>
-                )}
+
+                {/* Weather */}
                 {msg.weather && (
                   <div className="glass-card weather-card">
                     {msg.weather.icon && (
@@ -480,6 +492,7 @@ function App() {
                   </div>
                 )}
 
+                {/* News */}
                 {msg.news && (
                   <div className="chat-news">
                     {msg.news.map((article, i) => (
@@ -507,6 +520,7 @@ function App() {
                   </div>
                 )}
 
+                {/* GIFs */}
                 {msg.gifs && (
                   <div className="chat-gifs">
                     {msg.gifs.map((gif, j) => (
@@ -517,6 +531,7 @@ function App() {
               </div>
             ))}
 
+            {/* Typing indicator */}
             {typing && (
               <div className="chat-bubble bot typing">
                 🤖 <span className="dot"></span>
@@ -525,6 +540,7 @@ function App() {
               </div>
             )}
 
+            {/* Retry */}
             {retryMessage && (
               <div className="retry-container">
                 <button onClick={handleRetry}>
@@ -556,36 +572,18 @@ function App() {
                 }
               }}
             />
-            <button onClick={handleSend}>
+            <button
+              onClick={() => {
+                if (input.trim()) {
+                  handleSend();
+                  setHasStarted(true); // ✅ fixes send button issue
+                }
+              }}
+            >
               <img src={SendIcon} alt="Send" width="18" />
             </button>
             <VoiceControls onTranscribed={(text) => setInput(text)} />
           </div>
-
-          {/* Suggestions */}
-          {/* Suggestions */}
-          {!hasStarted && !input && !typing && (
-            <div className="suggestions">
-              {inlineSuggestions.map((s, i) => (
-                <button
-                  key={i}
-                  onClick={() => {
-                    if (s === "Create an image") {
-                      // 🖼 Directly open image generation flow
-                      const prompt = window.prompt(
-                        "Enter a prompt for image generation:"
-                      );
-                      if (prompt) handleImageGen(prompt);
-                    } else {
-                      handleSend(s);
-                    }
-                  }}
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          )}
         </>
       )}
 
@@ -602,6 +600,7 @@ function App() {
       {toast && <div className="toast">{toast}</div>}
     </div>
   );
+
 }
 
 export default App;

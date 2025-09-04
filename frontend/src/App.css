@@ -1262,8 +1262,8 @@ body {
   height: 200px;
   border-radius: 50%;
   position: absolute;
-  top: 80px;
-  left: 50%;
+  top: 100px;
+  left: 55%;
   transform: translateX(-50%);
   animation: floatMoon 6s ease-in-out infinite;
   z-index: 2;
@@ -1322,7 +1322,7 @@ body {
 /* Wrapper to group moon + halo stars */
 .moon-wrapper {
   position: absolute;
-  top: 80px;
+  top: 70px;
   left: 50%;
   transform: translateX(-50%);
   width: 260px;
@@ -1387,3 +1387,49 @@ body {
   0%, 100% { opacity: 0.8; }
   50% { opacity: 0.3; }
 }
+/* Wrapper for moon + text */
+
+/* Big title behind moon */
+.moon-title-behind {
+  position: absolute;
+  font-size: 6rem;    /* large and impactful */
+  font-weight: 900;
+  text-transform: uppercase;
+  z-index: 1;         /* behind moon */
+  opacity: 0.18;      /* subtle see-through */
+  letter-spacing: 5px;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Theme-specific styles */
+[data-theme="dark"] .moon-title-behind {
+  color: #cfe4ff;  /* icy blue for Esmeray */
+  text-shadow: 0 0 25px rgba(120, 180, 255, 0.6);
+}
+
+[data-theme="light"] .moon-title-behind {
+  color: #ffb3b3;  /* fiery red for Eclipse */
+  text-shadow: 0 0 25px rgba(255, 80, 80, 0.6);
+}
+
+
+
+/* Big faded title centered */
+.moon-title-behind {
+  position: absolute;
+  top: 0%;
+  left: 45%;
+  transform: translate(-50%, -50%); /* ⬅️ Centers it */
+  font-size: 5rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  z-index: 1; /* behind moon */
+  opacity: 0.15;
+  white-space: nowrap;
+  pointer-events: none;
+  text-align: center;
+}
+
+
