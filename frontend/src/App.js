@@ -224,11 +224,14 @@ function App() {
      typeMessage(res.data.response);
 
      // 2. Fetch related suggestions
-     const sugRes = await fetch("/api/suggestions", {
-       method: "POST",
-       headers: { "Content-Type": "application/json" },
-       body: JSON.stringify({ input: userInput, reply: res.data.response }),
-     });
+     const sugRes = await fetch(
+       "https://mernchatbot-seje.onrender.com/api/suggestions",
+       {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify({ input: userInput, reply: res.data.response }),
+       }
+     );
      const sugData = await sugRes.json();
 
      // 3. Store in state + open suggestions tab
@@ -403,15 +406,10 @@ function App() {
       {!historyOpen && (
         <div className="sidebar-btn">
           <button onClick={() => setHistoryOpen(true)} title="History">
-            <img
-              src={HistoryIcon}
-              alt="History"
-              width="24"
-              className="icon-img"
-            />
+            <img src={HistoryIcon} alt="History" width="24" />
           </button>
           <button onClick={toggleTheme} title="Toggle Theme">
-            <img src={ThemeIcon} alt="Theme" width="22" className="icon-img" />
+            <img src={ThemeIcon} alt="Theme" width="22" />
           </button>
         </div>
       )}
@@ -562,12 +560,7 @@ function App() {
                       }}
                       title="Like"
                     >
-                      <img
-                        src={ThumbsUpIcon}
-                        alt="Like"
-                        width="16"
-                        className="icon-img"
-                      />
+                      <img src={ThumbsUpIcon} alt="Like" width="16" />
                     </button>
 
                     {/* Dislike */}
@@ -584,12 +577,7 @@ function App() {
                       }}
                       title="Dislike"
                     >
-                      <img
-                        src={ThumbsDownIcon}
-                        alt="Dislike"
-                        width="16"
-                        className="icon-img"
-                      />
+                      <img src={ThumbsDownIcon} alt="Dislike" width="16" />
                     </button>
 
                     {/* Copy */}
@@ -612,12 +600,7 @@ function App() {
                       }}
                       title={msg.copied ? "Copied!" : "Copy"}
                     >
-                      <img
-                        src={CopyIcon}
-                        alt="Copy"
-                        width="16"
-                        className="icon-img"
-                      />
+                      <img src={CopyIcon} alt="Copy" width="16" />
                     </button>
 
                     {/* Regenerate */}
@@ -630,12 +613,7 @@ function App() {
                       }}
                       title="Regenerate"
                     >
-                      <img
-                        src={RefreshIcon}
-                        alt="Regenerate"
-                        width="16"
-                        className="icon-img"
-                      />
+                      <img src={RefreshIcon} alt="Regenerate" width="16" />
                     </button>
                   </div>
                 )}
@@ -643,19 +621,9 @@ function App() {
                 {/* === Images === */}
                 {msg.image && (
                   <div className="chat-image">
-                    <img
-                      src={msg.image}
-                      alt="generated"
-                      width="250"
-                      className="icon-img"
-                    />
+                    <img src={msg.image} alt="generated" width="250" />
                     <a href={msg.image} download="generated.png">
-                      <img
-                        src={DownloadIcon}
-                        alt="Download"
-                        width="18"
-                        className="icon-img"
-                      />
+                      <img src={DownloadIcon} alt="Download" width="18" />
                     </a>
                   </div>
                 )}
@@ -668,7 +636,6 @@ function App() {
                         src={msg.weather.icon}
                         alt="weather"
                         className="weather-icon"
-                        
                       />
                     )}
                     <div className="weather-info">
