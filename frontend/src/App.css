@@ -11,6 +11,20 @@
   --suggestion-bg: rgba(255, 255, 255, 0.25);
   --suggestion-hover: rgba(255, 255, 255, 0.35);
   --accent-color: #0078d4;
+  --neon-glow: 0 0 12px rgba(0, 180, 255, 0.8), 0 0 24px rgba(0, 180, 255, 0.6);
+  --welcome-active: 1;
+
+  /* 🔥 Missing variables for related suggestions */
+  --border-color: rgba(0,0,0,0.1);
+  --text-secondary: #555;
+  --btn-bg: rgba(0,120,212,0.1);
+  --btn-hover: rgba(0,120,212,0.2);
+  --glass: rgba(255,255,255,0.25);
+  --glass-bg: rgba(255,255,255,0.15);
+  --accent: #0078d4;
+  --accent-bg: rgba(0,120,212,0.15);
+  --accent-text: #0078d4;
+  --accent-hover: rgba(0,120,212,0.25);
 }
 
 [data-theme="dark"] {
@@ -25,18 +39,29 @@
   --suggestion-bg: rgba(50, 50, 50, 0.4);
   --suggestion-hover: rgba(70, 70, 70, 0.6);
   --accent-color: #3399ff;
+  --neon-glow: 0 0 12px rgba(51, 153, 255, 0.9), 0 0 24px rgba(51, 153, 255, 0.7);
+
+  /* 🔥 Dark theme equivalents */
+  --border-color: rgba(255,255,255,0.1);
+  --text-secondary: #aaa;
+  --btn-bg: rgba(51,153,255,0.1);
+  --btn-hover: rgba(51,153,255,0.25);
+  --glass: rgba(50,50,50,0.25);
+  --glass-bg: rgba(30,30,30,0.6);
+  --accent: #3399ff;
+  --accent-bg: rgba(51,153,255,0.15);
+  --accent-text: #eaeaea;
+  --accent-hover: rgba(51,153,255,0.35);
 }
 
-/* === Background Animation === */
+
+/* === Global Reset === */
 body {
-  background: linear-gradient(-45deg, #ff6ec4, #7873f5, #2ebf91, #ff9a9e);
-  background-size: 400% 400%;
-  animation: gradientMove 15s ease infinite;
-}
-@keyframes gradientMove {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: var(--bg-color);
+  font-family: "Segoe UI", system-ui, sans-serif;
 }
 
 /* === Container === */
@@ -44,10 +69,9 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  color: var(--text-color);
   background: rgba(255,255,255,0.2);
   backdrop-filter: blur(10px);
-  color: var(--text-color);
-  font-family: "Segoe UI", system-ui, sans-serif;
 }
 
 /* === Header === */
@@ -95,6 +119,7 @@ body {
 .sidebar-btn button:hover {
   transform: scale(1.05);
   background: rgba(255,255,255,0.25);
+  box-shadow: var(--neon-glow);
 }
 .sidebar-btn button img,
 .plusmenu-dropdown img {
@@ -103,24 +128,6 @@ body {
 [data-theme="dark"] .sidebar-btn button img,
 [data-theme="dark"] .plusmenu-dropdown img {
   filter: invert(1);
-}
-
-/* === Welcome Screen === */
-.welcome-screen {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2rem;
-  text-align: center;
-  padding: 20px;
-}
-.welcome-screen h2 {
-  font-size: 1.8rem;
-  font-weight: 600;
-  color: var(--text-color);
-  margin: 0;
 }
 
 /* === Messages === */
@@ -153,7 +160,7 @@ body {
   background: var(--user-bubble-bg);
   color: var(--user-bubble-text);
   backdrop-filter: blur(8px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  box-shadow: var(--neon-glow);
 }
 .chat-bubble.bot {
   align-self: flex-start;
@@ -211,7 +218,7 @@ body {
 }
 .chat-input input:focus {
   border-color: rgba(0, 120, 212, 0.6);
-  box-shadow: 0 0 0 3px rgba(0,120,212,0.3);
+  box-shadow: var(--neon-glow);
 }
 .chat-input button {
   background: rgba(0, 120, 212, 0.4);
@@ -223,7 +230,8 @@ body {
 }
 .chat-input button:hover {
   background: rgba(0, 120, 212, 0.6);
-  transform: scale(1.05);
+  transform: scale(1.1);
+  box-shadow: var(--neon-glow);
 }
 
 /* === Suggestions === */
@@ -231,29 +239,64 @@ body {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 10px;
-  padding: 12px 20px;
-  background: var(--bg-color);
-  border-top: 1px solid var(--input-border);
+  gap: 12px;
+  padding: 16px 20px;
+  background: transparent;
 }
 .suggestions button {
-  background: var(--suggestion-bg);
-  border: 1px solid #ddd;
-  padding: 8px 14px;
+  position: relative;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 999px;
-  font-size: 0.9rem;
+  padding: 10px 18px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-color);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  z-index: 1;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
+.suggestions button::before {
+  content: "";
+  position: absolute;
+  top: -2px; left: -2px; right: -2px; bottom: -2px;
+  background: linear-gradient(135deg, #00c6ff, #0078d4, #00ff9d);
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  filter: blur(6px);
+}
+.suggestions button:hover::before { opacity: 1; }
 .suggestions button:hover {
-  background: var(--suggestion-hover);
-  transform: translateY(-2px);
+  transform: translateY(-3px) scale(1.05);
+  color: #fff;
+  background: linear-gradient(135deg, rgba(0,120,212,0.8), rgba(0,180,255,0.6));
+  box-shadow: var(--neon-glow);
+  animation: pulseGlow 2s infinite;
+}
+.suggestions button:active { transform: scale(0.95); }
+
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 5px rgba(0,180,255,0.6), 0 0 15px rgba(0,180,255,0.4); }
+  50% { box-shadow: 0 0 15px rgba(0,180,255,0.9), 0 0 30px rgba(0,180,255,0.6); }
+  100% { box-shadow: 0 0 5px rgba(0,180,255,0.6), 0 0 15px rgba(0,180,255,0.4); }
+}
+[data-theme="dark"] .suggestions button {
+  background: rgba(40, 40, 40, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #eaeaea;
+}
+[data-theme="dark"] .suggestions button:hover {
+  background: linear-gradient(135deg, rgba(51,153,255,0.8), rgba(0,200,255,0.6));
 }
 
 /* === Retry button === */
-.retry-container {
-  text-align: center;
-}
+.retry-container { text-align: center; }
 .retry-container button {
   background: #ff3b30;
   color: #fff;
@@ -262,9 +305,7 @@ body {
   border-radius: 8px;
   cursor: pointer;
 }
-.retry-container button:hover {
-  background: #d92b20;
-}
+.retry-container button:hover { background: #d92b20; }
 
 /* === PlusMenu === */
 .plusmenu-wrapper { position: relative; display: flex; align-items: center; }
@@ -280,6 +321,7 @@ body {
 .plus-button:hover {
   transform: scale(1.1) rotate(90deg);
   background: rgba(255, 255, 255, 0.25);
+  box-shadow: var(--neon-glow);
 }
 .plusmenu-dropdown {
   position: absolute;
@@ -306,6 +348,7 @@ body {
   transition: background 0.2s ease-in-out;
 }
 .plusmenu-dropdown button:hover { background: #f5f7fa; }
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(5px); }
   to { opacity: 1; transform: translateY(0); }
@@ -360,441 +403,40 @@ body {
   background: rgba(70, 70, 70, 0.6);
 }
 
-/* === Toast === */
+/* === Toast (Upgraded, unified) === */
 .toast {
   position: fixed;
-  bottom: 20px; right: 20px;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.3);
-  color: #222;
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  animation: fadeInOut 2.5s ease forwards;
-}
-[data-theme="dark"] .toast {
-  background: rgba(40, 40, 40, 0.6);
-  color: #eee;
-}
-@keyframes fadeInOut {
-  0% { opacity: 0; transform: translateY(20px); }
-  20% { opacity: 1; transform: translateY(0); }
-  80% { opacity: 1; }
-  100% { opacity: 0; transform: translateY(20px); }
-}
-
-/* === Animations === */
-@keyframes bubblePopIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-/* === Responsive === */
-@media (max-width: 768px) {
-  .chat-messages { padding: 15px; }
-  .welcome-screen h2 { font-size: 1.4rem; }
-  .copilot-header h1 { font-size: 1rem; }
-}
-/* === Theme Variables === */
-:root {
-  --bg-color: #ffffff;
-  --text-color: #222;
-  --bot-bubble-bg: rgba(255, 255, 255, 0.25);
-  --bot-bubble-text: #111;
-  --user-bubble-bg: linear-gradient(135deg, rgba(0,120,212,0.8), rgba(0,180,255,0.6));
-  --user-bubble-text: #fff;
-  --input-bg: rgba(255, 255, 255, 0.15);
-  --input-border: #ccc;
-  --suggestion-bg: rgba(255, 255, 255, 0.25);
-  --suggestion-hover: rgba(255, 255, 255, 0.35);
-  --accent-color: #0078d4;
-  --neon-glow: 0 0 12px rgba(0, 180, 255, 0.8), 0 0 24px rgba(0, 180, 255, 0.6);
-}
-
-[data-theme="dark"] {
-  --bg-color: #1e1e1e;
-  --text-color: #f5f5f5;
-  --bot-bubble-bg: rgba(50, 50, 50, 0.35);
-  --bot-bubble-text: #eaeaea;
-  --user-bubble-bg: linear-gradient(135deg, rgba(0,120,212,0.8), rgba(0,180,255,0.6));
-  --user-bubble-text: #fff;
-  --input-bg: rgba(30, 30, 30, 0.4);
-  --input-border: #555;
-  --suggestion-bg: rgba(50, 50, 50, 0.4);
-  --suggestion-hover: rgba(70, 70, 70, 0.6);
-  --accent-color: #3399ff;
-  --neon-glow: 0 0 12px rgba(51, 153, 255, 0.9), 0 0 24px rgba(51, 153, 255, 0.7);
-}
-
-/* === Background Animation === */
-body {
-  background: linear-gradient(-45deg, #ff6ec4, #7873f5, #2ebf91, #ff9a9e);
-  background-size: 400% 400%;
-  animation: gradientMove 15s ease infinite;
-}
-@keyframes gradientMove {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* === Container === */
-.copilot-container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background: rgba(255,255,255,0.2);
-  backdrop-filter: blur(10px);
-  color: var(--text-color);
-  font-family: "Segoe UI", system-ui, sans-serif;
-}
-
-/* === Header === */
-.copilot-header {
-  position: sticky;
-  top: 0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 20px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(12px) saturate(180%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
-}
-[data-theme="dark"] .copilot-header {
-  background: rgba(20, 20, 20, 0.6);
-}
-.copilot-header h1 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin: 0;
-  color: var(--text-color);
-}
-
-/* === Sidebar button === */
-.sidebar-btn {
-  position: fixed;
-  top: 70px;
-  left: 15px;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.sidebar-btn button {
-  background: rgba(255,255,255,0.15);
-  border: 1px solid rgba(255,255,255,0.25);
-  border-radius: 12px;
-  padding: 10px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-}
-.sidebar-btn button:hover {
-  transform: scale(1.05);
-  background: rgba(255,255,255,0.25);
-  box-shadow: var(--neon-glow);
-}
-
-/* === Messages === */
-.chat-messages {
-  flex: 1;
-  padding: 20px 40px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* === Glassmorphic Chat Bubbles === */
-.chat-bubble {
-  padding: 12px 16px;
-  border-radius: 18px;
-  max-width: 70%;
-  word-wrap: break-word;
-  font-size: 0.95rem;
-  line-height: 1.5;
-  animation: bubblePopIn 0.3s ease forwards;
-  background: var(--bot-bubble-bg);
-  backdrop-filter: blur(12px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
-.chat-bubble.user {
-  align-self: flex-end;
-  border-bottom-right-radius: 6px;
-  background: var(--user-bubble-bg);
-  color: var(--user-bubble-text);
-  backdrop-filter: blur(8px);
-  box-shadow: var(--neon-glow);
-}
-.chat-bubble.bot {
-  align-self: flex-start;
-  border-bottom-left-radius: 6px;
-  color: var(--bot-bubble-text);
-}
-
-/* === Input Area === */
-.chat-input {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
-  margin: 12px;
-  border-radius: 18px;
-  background: var(--input-bg);
-  backdrop-filter: blur(12px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-}
-.chat-input input {
-  flex: 1;
-  padding: 12px 16px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.2);
-  color: var(--text-color);
-  font-size: 1rem;
-  outline: none;
-}
-.chat-input input:focus {
-  border-color: rgba(0, 120, 212, 0.6);
-  box-shadow: var(--neon-glow);
-}
-.chat-input button {
-  background: rgba(0, 120, 212, 0.4);
-  border: none;
-  padding: 10px;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-.chat-input button:hover {
-  background: rgba(0, 120, 212, 0.6);
-  transform: scale(1.1);
-  box-shadow: var(--neon-glow);
-}
-
-/* === Suggestions (Upgraded Glass/Gradient/Animation) === */
-.suggestions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 12px;
-  padding: 16px 20px;
-  background: transparent; /* blend with chat */
-}
-
-.suggestions button {
-  position: relative;
-  background: rgba(255, 255, 255, 0.15); /* glass */
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 999px;
-  padding: 10px 18px;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: var(--text-color);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  overflow: hidden;
-  z-index: 1;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-/* Neon Gradient Glow on hover */
-.suggestions button::before {
-  content: "";
-  position: absolute;
-  top: -2px; left: -2px; right: -2px; bottom: -2px;
-  background: linear-gradient(135deg, #00c6ff, #0078d4, #00ff9d);
-  border-radius: inherit;
-  z-index: -1;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  filter: blur(6px);
-}
-
-.suggestions button:hover::before {
-  opacity: 1;
-}
-
-.suggestions button:hover {
-  transform: translateY(-3px) scale(1.05);
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.95);
+  background: rgba(0, 0, 0, 0.7);
   color: #fff;
-  background: linear-gradient(135deg, rgba(0,120,212,0.8), rgba(0,180,255,0.6));
-  box-shadow: var(--neon-glow);
-}
-
-/* Pulse animation */
-.suggestions button:active {
-  transform: scale(0.95);
-}
-
-@keyframes pulseGlow {
-  0% { box-shadow: 0 0 5px rgba(0,180,255,0.6), 0 0 15px rgba(0,180,255,0.4); }
-  50% { box-shadow: 0 0 15px rgba(0,180,255,0.9), 0 0 30px rgba(0,180,255,0.6); }
-  100% { box-shadow: 0 0 5px rgba(0,180,255,0.6), 0 0 15px rgba(0,180,255,0.4); }
-}
-
-.suggestions button:hover {
-  animation: pulseGlow 2s infinite;
-}
-
-/* Dark theme adjustments */
-[data-theme="dark"] .suggestions button {
-  background: rgba(40, 40, 40, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #eaeaea;
-}
-[data-theme="dark"] .suggestions button:hover {
-  background: linear-gradient(135deg, rgba(51,153,255,0.8), rgba(0,200,255,0.6));
-}
-
-
-/* === PlusMenu === */
-.plus-button {
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  width: 36px; height: 36px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-}
-.plus-button:hover {
-  transform: scale(1.1) rotate(90deg);
-  background: rgba(255, 255, 255, 0.25);
-  box-shadow: var(--neon-glow);
-}
-
-/* === Toast === */
-.toast {
-  position: fixed;
-  bottom: 20px; right: 20px;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.3);
-  color: #222;
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  animation: fadeInOut 2.5s ease forwards;
-  box-shadow: var(--neon-glow);
-}
-[data-theme="dark"] .toast {
-  background: rgba(40, 40, 40, 0.6);
-  color: #eee;
-}
-
-/* === Animations === */
-@keyframes bubblePopIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-@keyframes fadeInOut {
-  0% { opacity: 0; transform: translateY(20px); }
-  20% { opacity: 1; transform: translateY(0); }
-  80% { opacity: 1; }
-  100% { opacity: 0; transform: translateY(20px); }
-}
-/* === Weather Cards in Chat === */
-.chat-weather {
-  margin-top: 8px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.chat-weather img {
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.3);
-  padding: 4px;
-  backdrop-filter: blur(6px);
-}
-.chat-bubble.bot .chat-weather {
-  margin-top: 6px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.chat-bubble.bot .chat-weather img {
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.3);
-  padding: 4px;
-  backdrop-filter: blur(6px);
-}
-.chat-news {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.news-card {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 12px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.news-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-}
-
-.news-image {
-  width: 90px;
-  height: 90px;
-  object-fit: cover;
-  border-radius: 10px;
-}
-
-.news-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.news-content h4 {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.news-content p {
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin: 0;
-}
-
-.news-content a {
-  font-size: 13px;
-  color: #0078ff;
-  text-decoration: none;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 0.95rem;
   font-weight: 500;
+  letter-spacing: 0.3px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  animation: toastSlide 0.4s ease forwards, fadeOut 3.5s ease forwards;
+  z-index: 2000;
+}
+[data-theme="light"] .toast {
+  background: rgba(255, 255, 255, 0.9);
+  color: #222;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+@keyframes toastSlide {
+  from { opacity: 0; transform: translateX(-50%) translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
+@keyframes fadeOut {
+  0%, 80% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-50%) translateY(20px) scale(0.95); }
 }
 
-.news-content a:hover {
-  text-decoration: underline;
-}
-/* === Shared Glass Card Styles === */
-.weather-card,
-.news-card {
+/* === Cards (Weather + News, unified) === */
+.glass-card {
   display: flex;
   align-items: flex-start;
   gap: 12px;
@@ -805,437 +447,37 @@ body {
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-
-.weather-card:hover,
-.news-card:hover {
+.glass-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
 }
 
-/* === Weather Card === */
-.weather-icon {
-  width: 60px;
-  height: 60px;
-}
-.weather-info h4 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 600;
-}
-.weather-info p {
-  margin: 4px 0;
-  font-size: 14px;
-  color: var(--text-secondary);
-}
+/* Weather specifics */
+.weather-card {}
+.weather-icon { width: 60px; height: 60px; }
+.weather-info h4 { margin: 0; font-size: 16px; font-weight: 600; }
+.weather-info p { margin: 4px 0; font-size: 14px; color: var(--text-color); opacity: 0.9; }
 
-/* === News Cards === */
-.chat-news {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  margin-top: 8px;
-}
+/* News specifics */
+.chat-news { display: flex; flex-direction: column; gap: 14px; margin-top: 8px; }
+.news-card {}
+.news-image { width: 100px; height: 100px; object-fit: cover; border-radius: 10px; }
+.news-content { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.news-content h4 { margin: 0; font-size: 15px; font-weight: 600; }
+.news-content p { font-size: 13px; margin: 0; opacity: 0.9; }
+.news-content a { font-size: 13px; color: #0078ff; text-decoration: none; font-weight: 500; }
+.news-content a:hover { text-decoration: underline; }
 
-.news-image {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 10px;
-}
-
-.news-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.news-content h4 {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 600;
-}
-.news-content p {
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin: 0;
-}
-.news-content a {
-  font-size: 13px;
-  color: #0078ff;
-  text-decoration: none;
-  font-weight: 500;
-}
-.news-content a:hover {
-  text-decoration: underline;
-}
-/* === Action Bar === */
-.message-actions {
-  display: flex;
-  gap: 14px;
-  margin-top: 8px;
-  padding-top: 6px;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  opacity: 0.85;
-}
-.message-actions button {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 6px;
-  border-radius: 6px;
-  transition: background 0.2s ease, transform 0.2s ease;
-}
-.message-actions button:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: scale(1.1);
-}
-
-/* === Follow-up Suggestions === */
-.followup-suggestions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
-}
-.followup-suggestions button {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 999px;
-  padding: 6px 14px;
-  font-size: 0.9rem;
-  color: var(--text-color);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-.followup-suggestions button:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
-}
-/* === Animated Moon === */
-.moon-container {
-  position: relative;
-  width: 120px;
-  height: 120px;
-  margin-bottom: 20px;
-  animation: floatMoon 6s ease-in-out infinite;
-}
-
-.moon {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #fff 40%, #ddd 70%, #aaa 100%);
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.7),
-              0 0 40px rgba(200, 200, 255, 0.5),
-              0 0 60px rgba(150, 150, 255, 0.3);
-  position: relative;
-  overflow: hidden;
-}
-
-/* Crater effects */
-.moon::before,
-.moon::after {
-  content: "";
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.15);
-}
-
-.moon::before {
-  width: 20px;
-  height: 20px;
-  top: 25px;
-  left: 30px;
-}
-
-.moon::after {
-  width: 15px;
-  height: 15px;
-  bottom: 30px;
-  right: 25px;
-}
-
-/* Floating animation */
-@keyframes floatMoon {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
-}
-/* === Cosmic Moon Scene === */
-.moon-scene {
-  position: relative;
-  width: 200px;   /* ⬅ Bigger moon */
-  height: 200px;
-  margin-bottom: 30px;
-  animation: floatMoon 6s ease-in-out infinite;
-}
-
-/* Moon styling */
-.moon {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #fff 40%, #ddd 70%, #aaa 100%);
-  box-shadow: 0 0 30px rgba(255, 255, 255, 0.8),
-              0 0 60px rgba(200, 200, 255, 0.5),
-              0 0 100px rgba(150, 150, 255, 0.4);
-  position: relative;
-  overflow: hidden;
-  z-index: 2;
-}
-
-/* Craters */
-.moon::before,
-.moon::after {
-  content: "";
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.15);
-}
-.moon::before {
-  width: 35px;
-  height: 35px;
-  top: 50px;
-  left: 60px;
-}
-.moon::after {
-  width: 25px;
-  height: 25px;
-  bottom: 60px;
-  right: 50px;
-}
-
-/* Floating animation */
-@keyframes floatMoon {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-25px); }
-}
-
-/* === Twinkling Stars === */
-.stars {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 200%;
-  height: 200%;
-  background: transparent url("https://www.transparenttextures.com/patterns/stardust.png") repeat;
-  background-size: 200px 200px;
-  animation: twinkle 10s linear infinite;
-  z-index: 1;
-  opacity: 0.8;
-  pointer-events: none;
-  border-radius: 50%;
-}
-
-/* Star twinkling effect */
-@keyframes twinkle {
-  from { background-position: 0 0; }
-  to { background-position: -200px -200px; }
-}
-/* === Cosmic Welcome Background === */
-.welcome-screen {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  background: #000; /* solid black */
-  overflow: hidden;
-  color: white;
-}
-
-/* Moon */
-.moon {
-  width: 180px;  /* increase moon size */
-  height: 180px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #fdfdfd, #cfcfcf 70%);
-  box-shadow: 0 0 40px rgba(255, 255, 255, 0.8),
-              0 0 80px rgba(200, 200, 255, 0.4);
-  animation: floatMoon 6s ease-in-out infinite;
-  z-index: 2;
-}
-
-@keyframes floatMoon {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-15px); }
-}
-
-/* Stars background */
-.stars {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%;
-  height: 100%;
-  background: transparent url("https://www.transparenttextures.com/patterns/stardust.png") repeat;
-  background-size: 200px 200px;
-  z-index: 1;
-  animation: twinkle 12s linear infinite, rotateStars 80s linear infinite;
-}
-
-@keyframes twinkle {
-  0%, 100% { opacity: 0.8; }
-  50% { opacity: 0.4; }
-}
-
-@keyframes rotateStars {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* Welcome text */
-.welcome-screen h2 {
-  margin-top: 2rem;
-  font-size: 2rem;
-  font-weight: 600;
-  color: #fff;
-  text-shadow: 0 0 12px rgba(255, 255, 255, 0.9);
-  z-index: 2;
-}
-/* === Global Backgrounds === */
-body {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-}
-
-/* Dark Theme → Moon + Stars */
-[data-theme="dark"] .cosmic-bg {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%;
-  height: 100%;
-  background: #000;
-  overflow: hidden;
-  z-index: -1;
-}
-
-[data-theme="dark"] .moon {
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  background: #fdfdfd;
-  box-shadow: 0 0 40px rgba(255, 255, 255, 0.8),
-              0 0 80px rgba(200, 200, 255, 0.4);
-  position: absolute;
-  top: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  animation: floatMoon 6s ease-in-out infinite;
-}
-
-@keyframes floatMoon {
-  0%, 100% { transform: translate(-50%, 0); }
-  50% { transform: translate(-50%, -20px); }
-}
-
-[data-theme="dark"] .stars {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: transparent url("https://www.transparenttextures.com/patterns/stardust.png") repeat;
-  background-size: 200px 200px;
-  animation: twinkle 12s linear infinite;
-  opacity: 0.7;
-  z-index: -1;
-}
-
-@keyframes twinkle {
-  0%, 100% { opacity: 0.8; }
-  50% { opacity: 0.3; }
-}
-
-/* Light Theme → Sun */
-[data-theme="light"] .cosmic-bg {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(to top, #87ceeb, #ffffff);
-  overflow: hidden;
-  z-index: -1;
-}
-
-[data-theme="light"] .sun {
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #fff200 30%, #ffae00 70%);
-  box-shadow: 0 0 40px rgba(255, 200, 0, 0.9),
-              0 0 100px rgba(255, 180, 0, 0.6);
-  position: absolute;
-  top: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  animation: pulseSun 6s ease-in-out infinite;
-}
-
-@keyframes pulseSun {
-  0%, 100% { transform: translateX(-50%) scale(1); }
-  50% { transform: translateX(-50%) scale(1.05); }
-}
-/* Eclipse Image for Light Theme */
-.eclipse {
-  position: absolute;
-  top: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 220px;
-  height: 220px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: pulseEclipse 8s ease-in-out infinite;
-}
-.eclipse-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-  box-shadow: 0 0 40px rgba(255, 100, 50, 0.9),
-              0 0 100px rgba(200, 50, 50, 0.6);
-}
-@keyframes pulseEclipse {
-  0%, 100% { transform: translateX(-50%) scale(1); }
-  50% { transform: translateX(-50%) scale(1.05); }
-}
-/* === Dark Theme → White Moon === */
-
-/* === Light Theme → Blood Moon / Eclipse === */
-[data-theme="light"] .moon {
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #ff4500 40%, #8b0000 70%, #330000 100%);
-  box-shadow: 0 0 50px rgba(255, 69, 0, 0.8),
-              0 0 100px rgba(255, 20, 0, 0.6),
-              0 0 150px rgba(255, 0, 0, 0.4);
-  position: absolute;
-  top: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  animation: floatMoon 6s ease-in-out infinite;
-}
-/* === Global Reset === */
-body {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-}
-
-/* === Cosmic Background Wrapper === */
+/* === Cosmic Background (Unified) === */
 .cosmic-bg {
   position: fixed;
   top: 0; left: 0;
   width: 100%;
   height: 100%;
-  background: #000; /* default dark sky */
+  background: #000; /* default */
   overflow: hidden;
   z-index: -1;
 }
-
-/* === Stars === */
 .stars {
   position: absolute;
   top: 0; left: 0;
@@ -1246,7 +488,6 @@ body {
   opacity: 0.7;
   z-index: -1;
 }
-
 @keyframes twinkle {
   0%, 100% { opacity: 0.8; }
   50% { opacity: 0.3; }
@@ -1256,70 +497,7 @@ body {
   to { transform: rotate(360deg); }
 }
 
-/* === Shared Moon Element === */
-.moon {
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  position: absolute;
-  top: 100px;
-  left: 55%;
-  transform: translateX(-50%);
-  animation: floatMoon 6s ease-in-out infinite;
-  z-index: 2;
-}
-
-@keyframes floatMoon {
-  0%, 100% { transform: translate(-50%, 0); }
-  50% { transform: translate(-50%, -20px); }
-}
-
-/* === Light Theme → Blood Moon (default welcome) === */
-[data-theme="light"] .moon {
-  background: radial-gradient(circle at 30% 30%, #ff4500 40%, #8b0000 70%, #330000 100%);
-  box-shadow: 0 0 60px rgba(255, 69, 0, 0.9),
-              0 0 120px rgba(255, 20, 0, 0.7),
-              0 0 200px rgba(255, 0, 0, 0.5);
-}
-
-/* === Dark Theme → White Moon === */
-[data-theme="dark"] .moon {
-  background: radial-gradient(circle at 30% 30%, #fdfdfd 40%, #cfcfcf 70%, #aaa 100%);
-  box-shadow: 0 0 60px rgba(255, 255, 255, 0.9),
-              0 0 120px rgba(200, 200, 255, 0.6),
-              0 0 200px rgba(150, 150, 255, 0.4);
-}
-/* 🌕 Dark Mode → White Moon */
-[data-theme="dark"] .moon {
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #fdfdfd, #cfcfcf 70%);
-  box-shadow: 0 0 40px rgba(255, 255, 255, 0.8),
-              0 0 80px rgba(200, 200, 255, 0.4);
-  position: absolute;
-  top: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  animation: floatMoon 6s ease-in-out infinite;
-}
-
-/* 🌑 Light Mode → Blood Moon */
-[data-theme="light"] .moon {
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #ff4500 40%, #8b0000 70%, #330000 100%);
-  box-shadow: 0 0 50px rgba(255, 69, 0, 0.8),
-              0 0 100px rgba(255, 20, 0, 0.6),
-              0 0 150px rgba(255, 0, 0, 0.4);
-  position: absolute;
-  top: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  animation: floatMoon 6s ease-in-out infinite;
-}
-/* Wrapper to group moon + halo stars */
+/* Shared moon + wrapper */
 .moon-wrapper {
   position: absolute;
   top: 70px;
@@ -1332,104 +510,396 @@ body {
   justify-content: center;
   pointer-events: none;
 }
+.moon {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  position: absolute;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: floatMoon 6s ease-in-out infinite;
+  z-index: 2;
+}
+@keyframes floatMoon {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, -20px); }
+}
 
-/* Local twinkling stars around moon */
+/* Halo stars around moon */
 .moon-stars {
   position: absolute;
   top: 0; left: 0;
   width: 100%;
   height: 100%;
+  border-radius: 50%;
   background: transparent url("https://www.transparenttextures.com/patterns/stardust.png") repeat;
-  background-size: 150px 150px;
-  opacity: 0.7;
-  border-radius: 50%;
-  z-index: 1;
-  animation: twinkle 10s linear infinite, rotateStars 60s linear infinite;
-}
-
-@keyframes rotateStars {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-/* Halo stars (shared) */
-.moon-stars {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
   background-size: 150px 150px;
   z-index: 1;
   pointer-events: none;
   animation: twinkle 10s linear infinite, rotateStars 60s linear infinite;
 }
 
-/* Dark Theme → cold silver stars */
+/* Theme-specific moon/stars */
+[data-theme="light"] .cosmic-bg {
+  background: linear-gradient(to top, #87ceeb, #ffffff);
+}
+[data-theme="light"] .moon {
+  background: radial-gradient(circle at 30% 30%, #ff4500 40%, #8b0000 70%, #330000 100%);
+  box-shadow: 0 0 60px rgba(255, 69, 0, 0.9),
+              0 0 120px rgba(255, 20, 0, 0.7),
+              0 0 200px rgba(255, 0, 0, 0.5);
+}
+[data-theme="dark"] .moon {
+  background: radial-gradient(circle at 30% 30%, #fdfdfd 40%, #cfcfcf 70%, #aaa 100%);
+  box-shadow: 0 0 60px rgba(255, 255, 255, 0.9),
+              0 0 120px rgba(200, 200, 255, 0.6),
+              0 0 200px rgba(150, 150, 255, 0.4);
+}
 [data-theme="dark"] .moon-stars {
-  background: transparent url("https://www.transparenttextures.com/patterns/stardust.png") repeat;
+  filter: hue-rotate(200deg) brightness(1.2);
   opacity: 0.7;
-  filter: hue-rotate(200deg) brightness(1.2); /* bluish silver */
 }
-
-/* Light Theme → warm golden stars */
 [data-theme="light"] .moon-stars {
-  background: transparent url("https://www.transparenttextures.com/patterns/stardust.png") repeat;
+  filter: hue-rotate(30deg) brightness(1.4) saturate(1.2);
   opacity: 0.6;
-  filter: hue-rotate(30deg) brightness(1.4) saturate(1.2); /* golden glow */
 }
 
-/* Animations */
-@keyframes rotateStars {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+/* === Animations (Unified) === */
+@keyframes bubblePopIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
-@keyframes twinkle {
-  0%, 100% { opacity: 0.8; }
-  50% { opacity: 0.3; }
-}
-/* Wrapper for moon + text */
 
-/* Big title behind moon */
+/* === Responsive === */
+@media (max-width: 768px) {
+  .chat-messages { padding: 15px; }
+  .copilot-header h1 { font-size: 1rem; }
+}
+
+/* === Welcome Screen (Unified) === */
+.welcome-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  padding: 20px;
+}
+.welcome-screen h2 {
+  margin-top: 2rem;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.9);
+  z-index: 2;
+}
+
+/* Title behind moon */
 .moon-title-behind {
   position: absolute;
-  font-size: 6rem;    /* large and impactful */
-  font-weight: 900;
-  text-transform: uppercase;
-  z-index: 1;         /* behind moon */
-  opacity: 0.18;      /* subtle see-through */
-  letter-spacing: 5px;
-  white-space: nowrap;
-  pointer-events: none;
-  user-select: none;
-}
-
-/* Theme-specific styles */
-[data-theme="dark"] .moon-title-behind {
-  color: #cfe4ff;  /* icy blue for Esmeray */
-  text-shadow: 0 0 25px rgba(120, 180, 255, 0.6);
-}
-
-[data-theme="light"] .moon-title-behind {
-  color: #ffb3b3;  /* fiery red for Eclipse */
-  text-shadow: 0 0 25px rgba(255, 80, 80, 0.6);
-}
-
-
-
-/* Big faded title centered */
-.moon-title-behind {
-  position: absolute;
-  top: 0%;
-  left: 45%;
-  transform: translate(-50%, -50%); /* ⬅️ Centers it */
+  top: 10%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   font-size: 5rem;
   font-weight: 800;
   text-transform: uppercase;
-  z-index: 1; /* behind moon */
+  z-index: 1;
   opacity: 0.15;
   white-space: nowrap;
   pointer-events: none;
   text-align: center;
 }
 
+[data-theme="dark"] .moon-title-behind {
+  color: #cfe4ff;
+  text-shadow: 0 0 25px rgba(120, 180, 255, 0.6);
+}
+[data-theme="light"] .moon-title-behind {
+  color: #b30000; /* deep blood red */
+  text-shadow: 0 0 40px rgba(255, 50, 50, 0.9),
+               0 0 80px rgba(200, 0, 0, 0.7);
+  opacity: 0.25; /* keep faint but readable */
+}
 
+/* === KnowledgeMenu === */
+.knowledgemenu-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.knowledge-button {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  margin-right: 6px;
+}
+.knowledge-button:hover {
+  transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: var(--neon-glow);
+}
+
+.knowledge-dropdown {
+  position: absolute;
+  bottom: 50px;
+  left: 0;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 200px;
+  animation: fadeIn 0.2s ease-in-out;
+  z-index: 100;
+}
+.knowledge-dropdown button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: transparent;
+  transition: background 0.2s ease-in-out;
+}
+.knowledge-dropdown button:hover {
+  background: #f5f7fa;
+}
+
+.related-suggestions {
+  margin-top: 8px;
+  border-left: 3px solid var(--accent);
+  background: var(--glass);
+  border-radius: 6px;
+  padding: 8px 10px;
+  border-top: 1px solid var(--border-color);
+}
+
+.related-suggestions h4 {
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: var(--text-secondary);
+  margin: 0 0 6px 0;
+}
+
+.related-suggestions ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.related-suggestions li {
+  margin-bottom: 4px;
+}
+
+.related-suggestions button {
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  text-align: left;
+  font-size: 14px;
+}
+
+.related-suggestions button:hover {
+  text-decoration: underline;
+}
+
+.suggestion-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.suggestion-buttons button {
+  background: var(--btn-bg);
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s;
+}
+
+.suggestion-buttons button:hover {
+  background: var(--btn-hover);
+}
+/* === Inline Related Suggestions Tab === */
+/* === Inline Related Suggestions Tab (Attached to Bot Bubble) === */
+/* === Inline Related Suggestions Tab (Auto-attached) === */
+
+.related-tab {
+  margin-top: 10px;
+  margin-left: 8px;
+  max-width: 90%;
+  background: var(--glass-bg);
+  border-radius: 10px;
+  padding: 10px 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+  border: 1px solid var(--border-color);
+  position: relative; /* needed for arrow */
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+/* 🔽 Arrow auto-centered under bubble */
+.related-tab::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 20px; /* default offset */
+  transform: translateX(0); /* will adjust with flex */
+  border-width: 0 8px 8px 8px;
+  border-style: solid;
+  border-color: transparent transparent var(--glass-bg) transparent;
+  filter: drop-shadow(0 -1px 1px rgba(0,0,0,0.1));
+}
+
+/* If parent is flex, center arrow */
+.chat-bubble.bot + .related-tab::before {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.related-tab h4 {
+  margin: 0 0 8px 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.related-tab .suggestion-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.related-tab .suggestion-buttons button {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: var(--accent-bg);
+  color: var(--accent-text);
+  text-align: left;
+  transition: background 0.2s ease;
+  font-size: 0.85rem;
+}
+
+.related-tab .suggestion-buttons button:hover {
+  background: var(--accent-hover);
+}
+
+.related-tab .close-tab {
+  margin-top: 8px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  align-self: flex-end;
+}
+/* === Message Actions (ChatGPT-style with active state) === */
+.message-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border-color);
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.message-actions:hover {
+  opacity: 1;
+}
+
+.message-actions .action-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.message-actions .action-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: scale(1.1);
+}
+
+.message-actions img {
+  opacity: 0.8;
+  transition: opacity 0.2s ease, filter 0.2s ease;
+}
+
+/* === Active states (filled effect) === */
+.message-actions .action-btn.active img {
+  opacity: 1;
+  filter: brightness(1.4) saturate(1.2);
+}
+
+/* === Copy feedback (Copied!) === */
+.message-actions .action-btn[title="Copied!"]::after {
+  content: "Copied!";
+  font-size: 12px;
+  color: var(--accent-color, #4ade80);
+  margin-left: 6px;
+  opacity: 0.9;
+  animation: fadeOut 1.2s forwards;
+}
+
+@keyframes fadeOut {
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* === ICONS WITH GLASS BACKGROUND === */
+.icon-img {
+  width: 18px;
+  height: 18px;
+  padding: 4px; /* some breathing space */
+  border-radius: 8px; /* rounded corners */
+  background: rgba(255, 255, 255, 0.15); /* translucent white */
+  backdrop-filter: blur(6px); /* glassy blur */
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25); /* subtle shadow */
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+/* Hover effect */
+.icon-img:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.1);
+}
+
+/* Light mode: keep background soft */
+[data-theme="light"] .icon-img {
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* Dark mode: stronger contrast */
+[data-theme="dark"] .icon-img {
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 1px 4px rgba(255, 255, 255, 0.1);
+}

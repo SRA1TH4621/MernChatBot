@@ -29,6 +29,11 @@ const ttsController = require("./controllers/ttsController");
 const visionController = require("./controllers/visionController");
 const weatherRoutes = require("./routes/weatherRoutes");
 const newsRoutes = require("./routes/newsRoutes");
+const knowledgeRoutes = require("./routes/knowledgeRoutes");
+const suggestionsRoutes = require("./routes/suggestions");
+
+
+
 
 // Routes
 const imageGenRoutes = require("./routes/imageGen");
@@ -135,12 +140,10 @@ app.post(
 );
 
 
-const exportRoutes = require("./routes/export");
-app.use("/api", exportRoutes);
-
 app.use("/api/weather", weatherRoutes);
 app.use("/api/news", newsRoutes);
-
+app.use("/api/knowledge", knowledgeRoutes);
+app.use("/api/suggestions", suggestionsRoutes);
 // ✅ Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);

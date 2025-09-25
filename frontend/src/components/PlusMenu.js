@@ -1,23 +1,20 @@
 import React, { useState, useRef } from "react";
-import { fetchTTS, fetchGhibliImage, generateImage } from "../lib/api";
+import { fetchTTS} from "../lib/api";
 
 // === ICONS ===
 import UploadIcon from "../icons/upload.svg";
 import GenerateIcon from "../icons/generate.svg";
 import TTSIcon from "../icons/tts.svg";
 import GifIcon from "../icons/gif.svg";
-import GhibliIcon from "../icons/ghibli.svg";
 import PlusIcon from "../icons/plus.svg";
 import CloseIcon from "../icons/close.svg";
 
-function PlusMenu({ onImageUpload, onImageGen, onGifGen, onGhibliGen }) {
+function PlusMenu({ onImageUpload, onImageGen, onGifGen}) {
   const [open, setOpen] = useState(false);
   const fileInputRef = useRef(null);
 
   // === Upload Image ===
-  const handleUpload = () => {
-    fileInputRef.current.click();
-  };
+  const handleUpload = () => fileInputRef.current.click();
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -28,10 +25,9 @@ function PlusMenu({ onImageUpload, onImageGen, onGifGen, onGhibliGen }) {
   const handleImageGen = () => {
     const prompt = window.prompt("Enter a prompt for image generation:");
     if (!prompt) return;
-    onImageGen(prompt); // ✅ just send prompt to App.js
+    onImageGen(prompt);
     setOpen(false);
   };
-
 
   // === Text-to-Speech ===
   const handleTTS = async () => {
@@ -73,21 +69,7 @@ function PlusMenu({ onImageUpload, onImageGen, onGifGen, onGhibliGen }) {
     setOpen(false);
   };
 
-  // === Ghibli Image ===
-  const handleGhibli = async () => {
-    try {
-      const res = await fetchGhibliImage();
-      if (res) {
-        onGhibliGen(res);
-      } else {
-        alert("❌ No Ghibli image found.");
-      }
-    } catch (err) {
-      console.error("Ghibli Error:", err);
-      alert("❌ Ghibli fetch failed.");
-    }
-    setOpen(false);
-  };
+
 
   return (
     <div className="plusmenu-wrapper">
@@ -123,9 +105,6 @@ function PlusMenu({ onImageUpload, onImageGen, onGifGen, onGhibliGen }) {
           </button>
           <button onClick={handleGIF}>
             <img src={GifIcon} alt="GIF" width="18" /> Search GIFs
-          </button>
-          <button onClick={handleGhibli}>
-            <img src={GhibliIcon} alt="Ghibli" width="18" /> Ghibli Image
           </button>
         </div>
       )}

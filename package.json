@@ -4,9 +4,14 @@
   "scripts": {
     "start": "concurrently \"npm run server\" \"npm run client\"",
     "server": "cd backend && nodemon server.js",
-    "client": "cd frontend && npm start"
+    "client": "cd frontend && npm start",
+    "test": "mocha tests --exit"
   },
   "devDependencies": {
-    "concurrently": "^8.2.0"
+    "chai": "^6.0.1",
+    "concurrently": "^8.2.0",
+    "form-data": "^4.0.4",
+    "mocha": "^11.7.2",
+    "supertest": "^7.1.4"
   }
 }
